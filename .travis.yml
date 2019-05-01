@@ -1,3 +1,16 @@
 language: python
 script:
-  - make
+- make
+deploy:
+  provider: releases
+  api_key:
+    secure: GxmFSz3TCLiUYGbpiSwQx8rBBoudpkQe4DbreasbpqsBXRTNzoT8tA3mjKbk0/ovhvVGwuUfp7BomtelVttGjXDJb86UbWzjgyNlyWr+510AECYA+LUhKQRsQ8s8SizHNVnWamq9+LtOaUCxewwoG+HV/Sk8FW2XE5e3GwCHyN2M3t5kxndSlqUxk5dL+flI+eZo1LtmA53NPB8PPhbSAcOeFlyBA7j0mTU9s+rn8y2iDjqJArLGnXkhxCNVxsD+9X9pDpICz1hcFoBYEfYOF37MJK3X3pLc1kIMdirlFkrbz8OdM505zX+TnfQLP8c/P8T+deOxUJvL2mnjNZS2l8ovjx5JggMe+ru/kFQtxcWyKbUHOXuUe04m8XKDqdCf+psA83MEhMkXkmoNX9lEzJBGOr2Re40cGY5qrWMV7H9OW/aKTxErERVebCHjWCtoameWyskako8JcJJASJuSDjRFQM07wEf4b2vYUqQpnrpU1lyIqHytuqB2+O3+8gKfkNzrppTO/KE7NfHZQFh1a81PramrkIi9LErDhMw92/4SfSaVQI/hcMD2NDL7Xevk+Q/QuvdnXuErXqJ2RaIxTrKoVEex/ORY+LgY64n6pN+EuJ4G0SPJ0ABnWQNroyk6Sj6dLlRQcQl7zYp0Lbb7FgU1dUULgn/WGr8Jtk3xQic=
+  file_glob: true
+  file: viscosity/**/*
+  skip_cleanup: true
+  overwrite: true
+  draft: true
+  on:
+    repo: alexey-petrov-occ/ketepflow
+    all_branches: true
+    tags: true
