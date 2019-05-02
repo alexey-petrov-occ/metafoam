@@ -1,6 +1,18 @@
 language: python
+
+python:
+  - 3.6
+
+before_install:
+  - sudo apt-get update
+  - make install
+
+install:
+  - pip install -r requirements-dev.txt
+
 script:
-- make
+  - make
+
 deploy:
   provider: releases
   api_key:
