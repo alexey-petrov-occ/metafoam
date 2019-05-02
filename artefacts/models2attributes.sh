@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 set -e
 
 list_of_models=${1}
