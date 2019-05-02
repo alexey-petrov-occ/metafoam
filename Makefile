@@ -10,15 +10,13 @@ foam-extend-3.0:
 
 foam = $<
 artefacts := $(shell pwd)/artefacts
-include artefacts/viscosity.mk
 
 test-openfoam-6: openfoam-6
 	artefacts/viscosity/foam2models.sh $(foam)
 	artefacts/viscosity/models2attributes.sh $(foam)
 
 test-foam-extend-3.0: foam-extend-3.0
-	- $(viscosity_generate)
-	$(viscosity_check)
+	artefacts/viscosity/foam2models.sh $(foam)
 	artefacts/viscosity/models2attributes.sh $(foam)
 
 clean: clean-artefacts

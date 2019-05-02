@@ -6,7 +6,8 @@ foam=${1}
 dir=$(cd `dirname $0` && pwd)
 source ${dir}/env.sh
 
-transportModels_dir=${foam}/src/transportModels
-(cd ${transportModels_dir} && basename -a $(grep -Ril -E 'public viscosityModel' .) | sed 's%\([^.]*\).*%\1%g' | sort --ignore-case) > ${viscosity_file}.txt
+models_dir="${foam}/src/transportModels"
+target_model='viscosityModel'
+target_file=${viscosity_file}
 
-diff --ignore-space-change ${viscosity_file}.ref ${viscosity_file}.txt || (cat ${viscosity_file}.txt && exit 1)
+artefacts/foam2models.sh ${models_dir} ${target_model} ${target_file}
