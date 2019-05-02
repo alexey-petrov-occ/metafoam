@@ -15,12 +15,12 @@ include artefacts/viscosity.mk
 test-openfoam-6: openfoam-6
 	- $(viscosity_generate)
 	$(viscosity_check)
-	artefacts/transports.sh ${viscosity_file} ${transportModels_dir} $(viscosity_dir)
+	artefacts/viscosity/models2attributes.sh $(foam)
 
 test-foam-extend-3.0: foam-extend-3.0
 	- $(viscosity_generate)
 	$(viscosity_check)
-	artefacts/transports.sh ${viscosity_file} ${transportModels_dir} $(viscosity_dir)
+	artefacts/viscosity/models2attributes.sh $(foam)
 
 clean: clean-artefacts
 	rm -fr foam-extend-* openfoam-*
