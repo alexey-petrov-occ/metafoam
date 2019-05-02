@@ -1,3 +1,5 @@
-openfoam-*
-foam-extend-*
+/openfoam-*
+/foam-extend-*
+*.txt
 .vscode/*
+!requirements-dev.txt
