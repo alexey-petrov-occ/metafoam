@@ -10,4 +10,4 @@ models_dir="${foam}/src/transportModels"
 target_model='viscosityModel'
 target_file=${viscosity_file}
 
-artefacts/foam2models.sh ${models_dir} ${target_model} ${target_file}
+artefacts/foam2models ${models_dir} ${target_model} ${target_file}
