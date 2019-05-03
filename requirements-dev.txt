@@ -10,5 +10,7 @@
 # `Pipfile.lock` and then regenerate `requirements*.txt`.
 ################################################################################
 
+jsonschema
 pipenv-to-requirements
+pylint
 pytest
