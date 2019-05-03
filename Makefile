@@ -1,6 +1,6 @@
 all: test-foam-extend-3.0 test-openfoam-6 test
 
-.PHONY: test-openfoam-6 test-foam-extend-3.0 clean-artefacts test txt2ref
+.PHONY: test-openfoam-6 test-foam-extend-3.0 clean-artefacts test txt2ref requirements-dev.txt
 
 openfoam-6:
 	git clone https://github.com/OpenFOAM/OpenFOAM-6.git openfoam-6
@@ -34,5 +34,5 @@ test:
 install:
 	sudo apt-get install -y coreutils findutils grep
 
-requirements:
+requirements-dev.txt:
 	pipenv run pipenv_to_requirements -d requirements-dev.txt

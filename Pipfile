@@ -6,8 +6,11 @@ verify_ssl = true
 [dev-packages]
 pytest = "*"
 pipenv-to-requirements = "*"
+jsonschema = "*"
+pylint = "*"
 
 [packages]
+jsonschema = "*"
 
 [requires]
 python_version = "3.7"
