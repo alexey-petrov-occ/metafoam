@@ -149,3 +149,29 @@ def test_models():
       'categories': [{'name': 'viscosity', 'models': ['b']}]
     }}
     validate(instance, models_schema)
+
+solver_schema = \
+{
+  'title': 'solver',
+  'defs': {
+    'category': {"type": "string"},
+  },
+ 'type': 'object', 'properties': {
+    'transport': {"$ref": "#/defs/category"},
+  },
+}
+
+def test_solver():
+    instance = {'transport': 'viscosity'}
+    validate(instance, solver_schema)
+
+def test_show_categories():
+    model = {'transport': {
+      'models': [{'name': 'a', 'attrs': ['x', 'y']}, {'name': 'b', 'attrs': ['z']}],
+      'categories': [{'name': 'K', 'models': ['b']}, {'name': 'L', 'models': ['a', 'c']}]
+    }}
+    validate(model, models_schema)
+
+    categories = dict((item['name'], item['models']) for item in model['transport']['categories'])
+    assert 'K' in categories
+    assert 'a' in categories['L']
