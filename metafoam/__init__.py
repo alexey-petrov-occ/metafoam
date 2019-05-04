@@ -9,13 +9,16 @@ JSSchema = Dict
 Name = str
 Names = List[Name]
 
+
 def categories(model: JSDocument) -> Dict:
     "Extracts 'categories' from the given OpenFOAM 'model' description"
     return dict((item['name'], item['models']) for item in model['categories'])
 
+
 def models(model: JSDocument) -> Dict:
     "Extracts 'models' from the given OpenFOAM 'model' description"
     return dict((item['name'], item['attrs']) for item in model['models'])
+
 
 def validate_model(document: JSDocument, schema: JSSchema) -> None:
     "Validates the 'core model' document against its schema"
@@ -28,6 +31,7 @@ def validate_model(document: JSDocument, schema: JSSchema) -> None:
     model2attrs = models(document['transport'])
     assert set(names) <= set(model2attrs)
 
+
 def validate_solver(solver_document: JSDocument, solver_schema: JSSchema, model_document: JSDocument) -> None:
     "Validates the 'solver' document against its schema"
     js.validate(solver_document, solver_schema)
@@ -35,9 +39,11 @@ def validate_solver(solver_document: JSDocument, solver_schema: JSSchema, model_
     category2models = categories(model_document['transport'])
     assert solver_document['transport'] in category2models
 
+
 class Solver:
     "Provides semantic level validation and programming API for an OpenFOAM solver"
     __slots__ = ('_solver', '_model', '_transport_model')
+
     def __init__(self, solver_document: JSDocument, solver_schema: JSSchema, model_document: JSDocument):
         validate_solver(solver_document, solver_schema, model_document)
         self._solver = solver_document
