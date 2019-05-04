@@ -55,10 +55,11 @@ requirements-dev.txt:
 	pipenv run pipenv_to_requirements -d requirements-dev.txt -f
 
 docker-env:
-	cd env && docker build --tag metafoam .
+	cd env && docker build --tag metafoam:ubuntu --file ubuntu.dockerfile .
+	cd env && docker build --tag metafoam:python --file python.dockerfile .
 
 docker-run:
-	docker run --rm -it -v $$(pwd):/code -w /code metafoam bash
+	docker run --rm -it -v $$(pwd):/code -w /code metafoam:python bash
 
 pipenv-env:
 	pipenv install --dev
