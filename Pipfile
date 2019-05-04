@@ -8,6 +8,7 @@ pytest = "*"
 pipenv-to-requirements = "*"
 jsonschema = "*"
 pylint = "*"
+pytest-mypy = "*"
 
 [packages]
 jsonschema = "*"
