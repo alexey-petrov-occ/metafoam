@@ -1,6 +1,8 @@
 check: test-foam-extend-3.0 test-openfoam-6 test pylint
 
-.PHONY: test-openfoam-6 test-foam-extend-3.0 clean-artefacts test pylint txt2ref requirements-dev.txt
+check-code: test pylint
+
+.PHONY: test-openfoam-6 test-foam-extend-3.0 clean-artefacts test pylint check-code txt2ref requirements-dev.txt
 
 openfoam-6:
 	git clone https://github.com/OpenFOAM/OpenFOAM-6.git openfoam-6

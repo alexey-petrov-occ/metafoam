@@ -165,24 +165,7 @@ def test_solver():
     instance = {'transport': 'viscosity'}
     validate(instance, solver_schema)
 
-from typing import Dict, Set, List
-
-JSDocument = Dict
-JSSchema = Dict
-Name = str
-Names = List[Name]
-
 from metafoam import *
-
-def validate_model(document: JSDocument, schema: JSSchema) -> None:
-    validate(document, schema)
-    category2models = categories(document['transport'])
-    names: Set[Name] = set()
-    for value in category2models.values():
-        names.update(value)
-
-    model2attrs = models(document['transport'])
-    assert set(names) <= set(model2attrs)
 
 def test_validate_model():
     model = {'transport': {

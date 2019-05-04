@@ -1,4 +1,5 @@
 from setuptools import setup, find_packages
+
 setup(
     name="metafoam",
     use_scm_version=True,
