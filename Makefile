@@ -1,10 +1,10 @@
 .PHONY: test-openfoam-6 test-foam-extend-3.0 clean-artefacts
-.PHONY: check-test check-pylint check-flake8 check-code
+.PHONY: check-test check-pylint check-flake8 check-code check-docs
 .PHONY: txt2ref requirements-dev.txt
 .PHONY: docker-run docker-env
 .PHONY: pipenv-run pipenv-env
 
-check: test-foam-extend-3.0 test-openfoam-6 check-code
+check: test-foam-extend-3.0 test-openfoam-6 check-code check-docs
 check-code: check-test check-pylint check-flake8
 
 openfoam-6:
@@ -65,3 +65,6 @@ pipenv-env:
 
 pipenv-run:
 	pipenv shell
+
+check-docs:
+	cd docs && make html
