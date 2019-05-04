@@ -165,24 +165,28 @@ def test_solver():
     instance = {'transport': 'viscosity'}
     validate(instance, solver_schema)
 
-from typing import Dict, Set
+from typing import Dict, Set, List
 
 JSDocument = Dict
 JSSchema = Dict
 Name = str
+Names = List[Name]
 
 def categories(model: JSDocument) -> Dict:
     return dict((item['name'], item['models']) for item in model['categories'])
 
+def models(model: JSDocument) -> Dict:
+    return dict((item['name'], item['attrs']) for item in model['models'])
+
 def validate_model(document: JSDocument, schema: JSSchema) -> None:
     validate(document, schema)
     category2models = categories(document['transport'])
-    models: Set[Name] = set()
+    names: Set[Name] = set()
     for value in category2models.values():
-        models.update(value)
+        names.update(value)
 
-    model2attrs = dict((item['name'], item['attrs']) for item in document['transport']['models'])
-    assert set(models) <= set(model2attrs)
+    model2attrs = models(document['transport'])
+    assert set(names) <= set(model2attrs)
 
 def test_validate_model():
     model = {'transport': {
@@ -229,6 +233,14 @@ class Solver(object):
     def transport(self) -> Name:
         return self._solver['transport']
 
+    @transport.setter
+    def transport(self, value: Name) -> None:
+        category2models = categories(self._model['transport'])
+        assert value in category2models
+
+        self._solver['transport'] = value
+        self._transport_model = ''
+
     @property
     def transport_model(self) -> Name:
         return self._transport_model
@@ -239,6 +251,13 @@ class Solver(object):
         assert value in category2models[self.transport]
 
         self._transport_model = value
+
+    @property
+    def transport_attrs(self) -> Names:
+        assert self._transport_model != ''
+
+        model2attrs = models(self._model['transport'])
+        return model2attrs[self._transport_model]
 
 def validate_slots(instance):
     with pytest.raises(AttributeError):
@@ -252,15 +271,30 @@ def test_solver_introspection():
       'categories': [{'name': 'K', 'models': ['b']}, {'name': 'L', 'models': ['a', 'c']}]
     }}
 
-    solver = {'transport': 'K'}
+    document = {'transport': 'K'}
 
-    inst = validate_slots(Solver(solver, solver_schema, model))
-    assert inst.transport == 'K'
+    solver = validate_slots(Solver(document, solver_schema, model))
+    assert solver.transport == 'K'
 
-    assert inst.transport_model == ''
+    assert solver.transport_model == ''
+    with pytest.raises(AssertionError):
+        solver.transport_attrs
 
-    inst.transport_model = 'b'
-    assert inst.transport_model == 'b'
+    solver.transport_model = 'b'
+    assert solver.transport_model == 'b'
 
     with pytest.raises(AssertionError):
-        inst.transport_model = 'a'
+        solver.transport_model = 'a'
+
+    assert solver.transport_attrs == ['z']
+
+    solver.transport = 'L'
+    assert solver.transport == 'L'
+
+    with pytest.raises(AssertionError):
+        solver.transport = 'M'
+    assert solver.transport == 'L'
+
+    assert solver.transport_model == ''
+    solver.transport_model = 'a'
+    assert solver.transport_attrs == ['x', 'y']
