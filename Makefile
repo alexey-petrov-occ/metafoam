@@ -31,8 +31,13 @@ txt2ref:
 test:
 	pytest test
 
-install:
+before_install:
+	sudo apt-get update
 	sudo apt-get install -y coreutils findutils grep
+
+install:
+	pip install -r requirements-dev.txt
+	python setup.py develop
 
 requirements-dev.txt:
 	pipenv run pipenv_to_requirements -d requirements-dev.txt

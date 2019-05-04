@@ -4,3 +4,7 @@
 .vscode/*
 !requirements-dev.txt
 .mypy_cache/*
+build/*
+dist/*
+metafoam.*
+.eggs/*

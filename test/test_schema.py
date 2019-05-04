@@ -172,8 +172,7 @@ JSSchema = Dict
 Name = str
 Names = List[Name]
 
-def categories(model: JSDocument) -> Dict:
-    return dict((item['name'], item['models']) for item in model['categories'])
+from metafoam import *
 
 def models(model: JSDocument) -> Dict:
     return dict((item['name'], item['attrs']) for item in model['models'])
