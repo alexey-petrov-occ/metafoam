@@ -3,3 +3,4 @@
 *.txt
 .vscode/*
 !requirements-dev.txt
+.mypy_cache/*

@@ -14,3 +14,4 @@ jsonschema
 pipenv-to-requirements
 pylint
 pytest
+pytest-mypy
