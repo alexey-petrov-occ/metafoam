@@ -149,3 +149,45 @@ def test_models():
       'categories': [{'name': 'viscosity', 'models': ['b']}]
     }}
     validate(instance, models_schema)
+
+solver_schema = \
+{
+  'title': 'solver',
+  'defs': {
+    'category': {"type": "string"},
+  },
+ 'type': 'object', 'properties': {
+    'transport': {"$ref": "#/defs/category"},
+  },
+}
+
+def test_solver():
+    instance = {'transport': 'viscosity'}
+    validate(instance, solver_schema)
+
+def categories(model):
+    return dict((item['name'], item['models']) for item in model['categories'])
+
+def validate_model(document, schema):
+    validate(document, schema)
+    category2model = categories(document['transport'])
+    models = set()
+    for value in category2model.values():
+        models.update(value)
+
+    model2attrs = dict((item['name'], item['attrs']) for item in document['transport']['models'])
+    assert set(models) <= set(model2attrs)
+
+def test_show_categories():
+    model = {'transport': {
+      'models': [{'name': 'a', 'attrs': ['x', 'y']}, {'name': 'b', 'attrs': ['z']}],
+      'categories': [{'name': 'K', 'models': ['b']}, {'name': 'L', 'models': ['a', 'c']}]
+    }}
+    validate(model, models_schema)
+
+    category2model = categories(model['transport'])
+    assert 'K' in category2model
+    assert 'a' in category2model['L']
+
+    with pytest.raises(AssertionError):
+      validate_model(model, models_schema)
