@@ -12,10 +12,12 @@ pytest-mypy = "*"
 pytest-cov = "*"
 pytest-xdist = "*"
 flake8 = "*"
+sphinx = "*"
+sphinx-autodoc-typehints = "*"
 
 [packages]
 jsonschema = "*"
 metafoam = {editable = true,path = "."}
 
 [requires]
-python_version = "3.7"
+python_version = "3.6"
