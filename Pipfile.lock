@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "31aa7c431f82c1c86c7225a1258425fc00588fe876df2e09b2b2e276cc631f10"
+            "sha256": "e82230ec2303196a239dd9a1c138a14777f9e20e891b7c004cf7c43984a3d68d"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -30,6 +30,10 @@
             ],
             "index": "pypi",
             "version": "==3.0.1"
+        },
+        "metafoam": {
+            "editable": true,
+            "path": "."
         },
         "pyrsistent": {
             "hashes": [

@@ -1,6 +1,6 @@
-all: test-foam-extend-3.0 test-openfoam-6 test
+check: test-foam-extend-3.0 test-openfoam-6 test pylint
 
-.PHONY: test-openfoam-6 test-foam-extend-3.0 clean-artefacts test txt2ref requirements-dev.txt
+.PHONY: test-openfoam-6 test-foam-extend-3.0 clean-artefacts test pylint txt2ref requirements-dev.txt
 
 openfoam-6:
 	git clone https://github.com/OpenFOAM/OpenFOAM-6.git openfoam-6
@@ -38,6 +38,9 @@ before_install:
 install:
 	pip install -r requirements-dev.txt
 	python setup.py develop
+
+pylint:
+	pylint metafoam --rcfile=${root}/.pylintrc
 
 requirements-dev.txt:
 	pipenv run pipenv_to_requirements -d requirements-dev.txt

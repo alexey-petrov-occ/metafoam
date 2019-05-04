@@ -10,7 +10,7 @@ install:
   - make install
 
 script:
-  - make
+  - make check
 
 deploy:
   provider: releases

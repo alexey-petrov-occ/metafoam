@@ -174,9 +174,6 @@ Names = List[Name]
 
 from metafoam import *
 
-def models(model: JSDocument) -> Dict:
-    return dict((item['name'], item['attrs']) for item in model['models'])
-
 def validate_model(document: JSDocument, schema: JSSchema) -> None:
     validate(document, schema)
     category2models = categories(document['transport'])
