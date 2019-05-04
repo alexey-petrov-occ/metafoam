@@ -10,3 +10,5 @@ metafoam.*
 .eggs/*
 .coverage
 .pylintrc.diff
+docs/_build/*
+__pycache__

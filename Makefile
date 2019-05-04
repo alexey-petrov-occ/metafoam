@@ -1,6 +1,8 @@
 .PHONY: test-openfoam-6 test-foam-extend-3.0 clean-artefacts
 .PHONY: check-test check-pylint check-flake8 check-code
 .PHONY: txt2ref requirements-dev.txt
+.PHONY: docker-run docker-env
+.PHONY: pipenv-run pipenv-env
 
 check: test-foam-extend-3.0 test-openfoam-6 check-code
 check-code: check-test check-pylint check-flake8
@@ -36,7 +38,7 @@ check-test:
 
 before_install:
 	sudo apt-get update
-	sudo apt-get install -y coreutils findutils grep
+	sudo apt-get install -y coreutils findutils grep python3-sphinx
 
 install:
 	pip install -r requirements-dev.txt
@@ -51,3 +53,15 @@ check-flake8:
 
 requirements-dev.txt:
 	pipenv run pipenv_to_requirements -d requirements-dev.txt -f
+
+docker-env:
+	cd env && docker build --tag metafoam .
+
+docker-run:
+	docker run --rm -it -v $$(pwd):/code -w /code metafoam bash
+
+pipenv-env:
+	pipenv install --dev
+
+pipenv-run:
+	pipenv shell

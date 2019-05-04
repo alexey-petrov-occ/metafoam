@@ -3,19 +3,19 @@
 from typing import Dict, Set, List
 import jsonschema as js
 
-JSDocument = Dict
-JSSchema = Dict
+JSDocument = Dict  #: typedef on JSON document
+JSSchema = Dict  #: typedef on JSON schema
 
-Name = str
-Names = List[Name]
+Name = str  #: typedef on entity 'name'
+Names = List[Name]  #: typedef on entity 'names'
 
 
-def categories(model: JSDocument) -> Dict:
+def categories(model: JSDocument) -> Dict[Name, Names]:
     "Extracts 'categories' from the given OpenFOAM 'model' description"
     return dict((item['name'], item['models']) for item in model['categories'])
 
 
-def models(model: JSDocument) -> Dict:
+def models(model: JSDocument) -> Dict[Name, Names]:
     "Extracts 'models' from the given OpenFOAM 'model' description"
     return dict((item['name'], item['attrs']) for item in model['models'])
 
