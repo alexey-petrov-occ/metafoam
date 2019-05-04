@@ -12,6 +12,7 @@ pytest-mypy = "*"
 
 [packages]
 jsonschema = "*"
+metafoam = {editable = true,path = "."}
 
 [requires]
 python_version = "3.7"
