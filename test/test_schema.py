@@ -181,12 +181,6 @@ def test_validate_model():
     with pytest.raises(AssertionError):
       validate_model(model, models_schema)
 
-def validate_solver(solver_document: JSDocument, solver_schema: JSSchema, model_document: JSDocument) -> None:
-    validate(solver_document, solver_schema)
-
-    category2models = categories(model_document['transport'])
-    assert solver_document['transport'] in category2models
-
 def test_validate_solver():
     model = {'transport': {
       'models': [{'name': 'a', 'attrs': ['x', 'y']}, {'name': 'b', 'attrs': ['z']}],
@@ -199,44 +193,6 @@ def test_validate_solver():
     with pytest.raises(AssertionError):
       solver = {'transport': 'M'}
       validate_solver(solver, solver_schema, model)
-
-class Solver(object):
-    __slots__ = ('_solver', '_model', '_transport_model')
-    def __init__(self, solver_document: JSDocument, solver_schema: JSSchema, model_document: JSDocument):
-        validate_solver(solver_document, solver_schema, model_document)
-        self._solver = solver_document
-        self._model = model_document
-        self._transport_model: Name = ''
-
-    @property
-    def transport(self) -> Name:
-        return self._solver['transport']
-
-    @transport.setter
-    def transport(self, value: Name) -> None:
-        category2models = categories(self._model['transport'])
-        assert value in category2models
-
-        self._solver['transport'] = value
-        self._transport_model = ''
-
-    @property
-    def transport_model(self) -> Name:
-        return self._transport_model
-
-    @transport_model.setter
-    def transport_model(self, value: Name) -> None:
-        category2models = categories(self._model['transport'])
-        assert value in category2models[self.transport]
-
-        self._transport_model = value
-
-    @property
-    def transport_attrs(self) -> Names:
-        assert self._transport_model != ''
-
-        model2attrs = models(self._model['transport'])
-        return model2attrs[self._transport_model]
 
 def validate_slots(instance):
     with pytest.raises(AttributeError):

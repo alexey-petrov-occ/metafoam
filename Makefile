@@ -1,8 +1,9 @@
-check: test-foam-extend-3.0 test-openfoam-6 test pylint
+.PHONY: test-openfoam-6 test-foam-extend-3.0 clean-artefacts
+.PHONY: check-test check-pylint check-code
+.PHONY: txt2ref requirements-dev.txt
 
-check-code: test pylint
-
-.PHONY: test-openfoam-6 test-foam-extend-3.0 clean-artefacts test pylint check-code txt2ref requirements-dev.txt
+check: test-foam-extend-3.0 test-openfoam-6 check-code
+check-code: check-test check-pylint
 
 openfoam-6:
 	git clone https://github.com/OpenFOAM/OpenFOAM-6.git openfoam-6
@@ -30,7 +31,7 @@ clean-artefacts:
 txt2ref:
 	find artefacts -name '*.txt' -exec ${root}/txt2ref {} \;
 
-test:
+check-test:
 	pytest test
 
 before_install:
@@ -41,8 +42,9 @@ install:
 	pip install -r requirements-dev.txt
 	python setup.py develop
 
-pylint:
+check-pylint:
 	pylint metafoam --rcfile=${root}/.pylintrc
+	@diff ${root}/.pylintrc ${root}/.pylintrc.ref > ${root}/.pylintrc.diff || exit 0
 
 requirements-dev.txt:
-	pipenv run pipenv_to_requirements -d requirements-dev.txt
+	pipenv run pipenv_to_requirements -d requirements-dev.txt -f

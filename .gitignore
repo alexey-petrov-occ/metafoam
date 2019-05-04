@@ -8,3 +8,5 @@ build/*
 dist/*
 metafoam.*
 .eggs/*
+.coverage
+.pylintrc.diff

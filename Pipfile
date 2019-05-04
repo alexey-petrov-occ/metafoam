@@ -9,6 +9,9 @@ pipenv-to-requirements = "*"
 jsonschema = "*"
 pylint = "*"
 pytest-mypy = "*"
+pytest-cov = "*"
+pytest-xdist = "*"
+flake8 = "*"
 
 [packages]
 jsonschema = "*"
