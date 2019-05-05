@@ -1,9 +1,14 @@
 import pytest
 
+# import warnings
+# warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+
 import jsonschema
 from jsonschema import validate
+import python_jsonschema_objects
 
-def test_basic():
+def test_jsonschema():
     # A sample schema, like what we'd get from json.load()
     schema = {
         "type" : "object",
@@ -20,6 +25,24 @@ def test_basic():
         validate(
             instance={"name" : "Eggs", "price" : "Invalid"}, schema=schema,
         )
+
+def test_python_jsonschema_objects():
+    schema = {
+        'title': 'dummy', # mandatory field
+        "type" : "object",
+        "properties" : {
+            "price" : {"type" : "number"},
+            "name" : {"type" : "string"},
+        },
+    }
+
+    builder = python_jsonschema_objects.ObjectBuilder(schema)
+    ns = builder.build_classes()
+
+    dummy = ns.Dummy()
+    dummy.price = 1
+    with pytest.raises(python_jsonschema_objects.validators.ValidationError):
+      dummy.price = ''
 
 array_schema = \
 {

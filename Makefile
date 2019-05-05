@@ -33,7 +33,7 @@ x-update-refs:
 	find ${artefacts} -name '*.txt' -exec ${artefacts}/txt2ref {} \;
 
 x-check-test:
-	pytest --no-cov test
+	pytest --no-cov -n 0 test
 
 x-check-coverage:
 	pytest test
