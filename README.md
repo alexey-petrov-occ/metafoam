@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/alexey-petrov-occ/ketepflow.svg?branch=master)](https://travis-ci.com/alexey-petrov-occ/ketepflow)[![Reviewed by Hound](https://img.shields.io/badge/Reviewed_by-Hound-8E64B0.svg)](https://houndci.com)[![Requirements Status](https://requires.io/github/alexey-petrov-occ/ketepflow/requirements.svg)](https://requires.io/github/alexey-petrov-occ/ketepflow/requirements)
+[![Build Status](https://travis-ci.com/alexey-petrov-occ/ketepflow.svg?branch=master)](https://travis-ci.com/alexey-petrov-occ/ketepflow)[![Reviewed by Hound](https://img.shields.io/badge/Reviewed_by-Hound-8E64B0.svg)](https://houndci.com)[![Requirements Status](https://requires.io/github/alexey-petrov-occ/ketepflow/requirements.svg)](https://requires.io/github/alexey-petrov-occ/ketepflow/requirements)[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/python/black)
 # ketepflow
 
 ## Development environment
