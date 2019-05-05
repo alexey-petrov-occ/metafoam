@@ -2,7 +2,8 @@
 .PHONY: $(wildcard x-*)
 
 x-build: x-foam-extend-3.0 x-openfoam-6 x-check-code x-check-docs
-x-check-code: x-check-test x-check-pylint x-check-flake8
+x-check-code: x-check-test x-check-style
+x-check-style: x-check-pylint x-check-flake8 x-check-black
 
 openfoam-6:
 	git clone https://github.com/OpenFOAM/OpenFOAM-6.git openfoam-6
@@ -48,6 +49,9 @@ x-check-pylint:
 
 x-check-flake8:
 	flake8 metafoam
+
+x-check-black:
+	black --config pyproject.toml metafoam
 
 requirements-dev.txt:
 	pipenv run pipenv_to_requirements -d requirements-dev.txt -f
