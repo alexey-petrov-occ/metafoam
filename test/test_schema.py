@@ -165,7 +165,7 @@ def test_solver():
     instance = {'transport': 'viscosity'}
     validate(instance, solver_schema)
 
-from metafoam import *
+from metafoam.common import *
 
 def test_validate_model():
     model = {'transport': {
@@ -199,6 +199,8 @@ def validate_slots(instance):
       setattr(instance, 'dummy', 1)
 
     return instance
+
+from metafoam.solver import *
 
 def test_solver_introspection():
     model = {'transport': {
