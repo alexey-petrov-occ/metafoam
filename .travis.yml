@@ -4,13 +4,13 @@ python:
   - 3.6
 
 before_install:
-  - make before_install
+  - make travis-before_install
 
 install:
-  - make install
+  - make travis-install
 
 script:
-  - make check
+  - make x-build
 
 deploy:
   provider: releases
