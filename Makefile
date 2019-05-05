@@ -1,11 +1,8 @@
-.PHONY: test-openfoam-6 test-foam-extend-3.0 clean-artefacts
-.PHONY: check-test check-pylint check-flake8 check-code check-docs
-.PHONY: txt2ref requirements-dev.txt
-.PHONY: docker-run docker-env
-.PHONY: pipenv-run pipenv-env
+.PHONY: requirements-dev.txt
+.PHONY: $(wildcard x-*)
 
-check: test-foam-extend-3.0 test-openfoam-6 check-code check-docs
-check-code: check-test check-pylint check-flake8
+x-build: x-foam-extend-3.0 x-openfoam-6 x-check-code x-check-docs
+x-check-code: x-check-test x-check-pylint x-check-flake8
 
 openfoam-6:
 	git clone https://github.com/OpenFOAM/OpenFOAM-6.git openfoam-6
@@ -15,57 +12,57 @@ foam-extend-3.0:
 
 foam = $<
 root := $(shell pwd)
+artefacts := $(root)/artefacts
 
-test-openfoam-6: openfoam-6
+x-openfoam-6: openfoam-6
 	artefacts/viscosity/foam2models $(foam)
 	artefacts/viscosity/models2attributes $(foam)
 
-test-foam-extend-3.0: foam-extend-3.0
+x-foam-extend-3.0: foam-extend-3.0
 	artefacts/viscosity/foam2models $(foam)
 	artefacts/viscosity/models2attributes $(foam)
 
-clean: clean-artefacts
+clean: x-clean-artefacts
 	rm -fr foam-extend-* openfoam-*
 
-clean-artefacts:
+x-clean-artefacts:
 	find artefacts -name '*.txt' -exec rm -fr {} \;
 
-txt2ref:
-	find artefacts -name '*.txt' -exec ${root}/txt2ref {} \;
+x-update-refs:
+	find ${artefacts} -name '*.txt' -exec ${artefacts}/txt2ref {} \;
 
-check-test:
+x-check-test:
 	pytest test
 
-before_install:
+travis-before_install:
 	sudo apt-get update
 	sudo apt-get install -y coreutils findutils grep python3-sphinx
 
-install:
+travis-install:
 	pip install -r requirements-dev.txt
 	python setup.py develop
 
-check-pylint:
+x-check-pylint:
 	pylint metafoam --rcfile=${root}/.pylintrc
 	@diff ${root}/.pylintrc ${root}/.pylintrc.ref > ${root}/.pylintrc.diff || exit 0
 
-check-flake8:
+x-check-flake8:
 	flake8 metafoam
 
 requirements-dev.txt:
 	pipenv run pipenv_to_requirements -d requirements-dev.txt -f
 
-docker-env:
-	cd env && docker build --tag metafoam:ubuntu --file ubuntu.dockerfile .
-	cd env && docker build --tag metafoam:python --file python.dockerfile .
+x-docker-env:
+	docker build --tag metafoam:python --file env/python.dockerfile env
 
-docker-run:
+x-docker-run:
 	docker run --rm -it -v $$(pwd):/code -w /code metafoam:python bash
 
-pipenv-env:
+x-pipenv-env:
 	pipenv install --dev
 
-pipenv-run:
+x-pipenv-run:
 	pipenv shell
 
-check-docs:
+x-check-docs:
 	cd docs && make html
