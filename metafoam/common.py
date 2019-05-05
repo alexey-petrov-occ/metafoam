@@ -9,13 +9,15 @@ JSSchema = Dict  #: typedef on JSON schema
 Name = str  #: typedef on entity 'name'
 Names = List[Name]  #: typedef on entity 'names'
 
+Entity2Attrs = Dict[Name, Names]  #: typedef on entity to 'attrs' mapping
 
-def categories(model: JSDocument) -> Dict[Name, Names]:
+
+def categories(model: JSDocument) -> Entity2Attrs:
     "Extracts 'categories' from the given OpenFOAM 'model' description"
     return dict((item['name'], item['models']) for item in model['categories'])
 
 
-def models(model: JSDocument) -> Dict[Name, Names]:
+def models(model: JSDocument) -> Entity2Attrs:
     "Extracts 'models' from the given OpenFOAM 'model' description"
     return dict((item['name'], item['attrs']) for item in model['models'])
 
