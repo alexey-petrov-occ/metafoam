@@ -200,17 +200,24 @@ def validate_slots(instance):
 
     return instance
 
+from metafoam.core import *
 from metafoam.solver import *
 
 def test_solver_introspection():
     model = {'transport': {
-      'models': [{'name': 'a', 'attrs': ['x', 'y']}, {'name': 'b', 'attrs': ['z']}],
-      'categories': [{'name': 'K', 'models': ['b']}, {'name': 'L', 'models': ['a', 'c']}]
+      'models': [{'name': 'a', 'attrs': ['x', 'y']},
+                 {'name': 'b', 'attrs': ['z']},
+                 {'name': 'c', 'attrs': []}],
+      'categories': [{'name': 'K', 'models': ['b']},
+                     {'name': 'L', 'models': ['a', 'c']}]
     }}
 
     document = {'transport': 'K'}
 
-    solver = validate_slots(Solver(document, solver_schema, model))
+    validate(model, models_schema)
+    core = Core(model, models_schema)
+
+    solver = validate_slots(Solver(document, solver_schema, core))
     assert solver.transport == 'K'
 
     assert solver.transport_model == ''
