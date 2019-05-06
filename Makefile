@@ -33,16 +33,17 @@ x-update-refs:
 	find ${artefacts} -name '*.txt' -exec ${artefacts}/txt2ref {} \;
 
 x-check-test:
-	pytest --no-cov -n 0 test
+	pytest --no-cov --numprocesses=0 test
 
 x-check-coverage:
-	pytest test
+	pytest --cov-fail-under=100 --cov-report term-missing --cov-branch --numprocesses=auto -p no:warnings test
 
 travis-before_install:
 	sudo apt-get update
 	sudo apt-get install -y coreutils findutils grep python3-sphinx
 
 travis-install:
+	pip install codecov
 	pip install -r requirements-dev.txt
 	python setup.py develop
 

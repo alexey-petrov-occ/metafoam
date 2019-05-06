@@ -12,6 +12,9 @@ install:
 script:
   - make x-build
 
+after_success:
+  - codecov
+
 deploy:
   provider: releases
   api_key:
