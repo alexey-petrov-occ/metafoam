@@ -2,7 +2,7 @@ import pytest
 
 import jsonschema
 from jsonschema import validate
-import python_jsonschema_objects
+import python_jsonschema_objects as pjs
 
 def test_jsonschema():
     # A sample schema, like what we'd get from json.load()
@@ -32,12 +32,12 @@ def test_python_jsonschema_objects():
         },
     }
 
-    builder = python_jsonschema_objects.ObjectBuilder(schema)
+    builder = pjs.ObjectBuilder(schema)
     ns = builder.build_classes()
 
     dummy = ns.Dummy()
     dummy.price = 1
-    with pytest.raises(python_jsonschema_objects.validators.ValidationError):
+    with pytest.raises(pjs.validators.ValidationError):
       dummy.price = ''
 
 array_schema = \
@@ -66,7 +66,7 @@ nuInf
 
 attrs_schema = \
 {
-  'defs': {
+  'definitions': {
     'attr': {
       "type": "string",
     },
@@ -74,13 +74,13 @@ attrs_schema = \
       "type": "array",
       "items": [
         {
-          "$ref": "#/defs/attr"
+          "$ref": "#/definitions/attr"
         }
       ]
     },
   },
   'type': 'object', 'properties': {
-    'attrs': {"$ref": "#/defs/attrs"}
+    'attrs': {"$ref": "#/definitions/attrs"}
   }
 }
 
@@ -90,7 +90,7 @@ def test_attrs():
 
 model_schema = \
 {
-  'defs': {
+  'definitions': {
     'attr': {
       "type": "string",
     },
@@ -98,18 +98,18 @@ model_schema = \
       "type": "array",
       "items": [
         {
-          "$ref": "#/defs/attr"
+          "$ref": "#/definitions/attr"
         }
       ]
     },
     'model': {
       'type': 'object', 'properties': {
         'name': {'type': 'string'},
-        '$ref': '#/defs/attrs'
+        'attrs': {'$ref': '#/definitions/attrs'},
       }
     }
   },
-  "type": "array", "items": [{"$ref": "#/defs/model"}]
+  "type": "array", "items": [{"$ref": "#/definitions/model"}]
 }
 
 def test_model():
@@ -118,7 +118,7 @@ def test_model():
 
 models_schema = \
 {
-  "defs": {
+  "definitions": {
     'attr': {
       "type": "string",
     },
@@ -126,14 +126,14 @@ models_schema = \
       "type": "array",
       "items": [
         {
-          "$ref": "#/defs/attr"
+          "$ref": "#/definitions/attr"
         }
       ]
     },
     'model': {
       'type': 'object', 'properties': {
         'name': {'type': 'string'},
-        '$ref': '#/defs/attrs'
+        'attrs': {'$ref': '#/definitions/attrs'},
       }
     },
     "name": {
@@ -143,21 +143,22 @@ models_schema = \
       "type": "array",
       "items": [
         {
-          "$ref": "#/defs/name"
+          "$ref": "#/definitions/name"
         }
       ]
     },
     'category': {
       'type': 'object', 'properties': {
         'name': {'type': 'string'},
-        'models': {"$ref": "#/defs/names"}
+        'models': {"$ref": "#/definitions/names"}
       }
     }
   },
+  'title': 'core',
   'type': 'object', 'properties': {
     'transport': {'type': 'object', 'properties': {
-      'models': {"type": "array", "items": [{"$ref": "#/defs/model"}]},
-      'categories': {"type": "array", "items": [{"$ref": "#/defs/category"}]}
+      'models': {"type": "array", "items": [{"$ref": "#/definitions/model"}]},
+      'categories': {"type": "array", "items": [{"$ref": "#/definitions/category"}]}
     }}
   }
 }
@@ -169,14 +170,17 @@ def test_models():
     }}
     validate(instance, models_schema)
 
+    builder = pjs.ObjectBuilder(models_schema)
+    ns = builder.build_classes()
+
 solver_schema = \
 {
   'title': 'solver',
-  'defs': {
+  'definitions': {
     'category': {"type": "string"},
   },
  'type': 'object', 'properties': {
-    'transport': {"$ref": "#/defs/category"},
+    'transport': {"$ref": "#/definitions/category"},
   },
 }
 
