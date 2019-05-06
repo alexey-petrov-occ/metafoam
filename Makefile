@@ -55,7 +55,7 @@ x-check-flake8:
 	flake8 metafoam
 
 x-check-black:
-	black --config pyproject.toml metafoam
+	black --config .pyproject.toml metafoam
 
 requirements-dev.txt:
 	pipenv run pipenv_to_requirements -d requirements-dev.txt -f
