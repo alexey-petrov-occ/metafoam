@@ -1,9 +1,5 @@
 import pytest
 
-# import warnings
-# warnings.filterwarnings("ignore", category=DeprecationWarning)
-
-
 import jsonschema
 from jsonschema import validate
 import python_jsonschema_objects
