@@ -58,11 +58,10 @@ def test_translation():
     with pytest.raises(js.exceptions.ValidationError):
         source = {'transport': {}, 'x': {}}
         js.validate(source, models_schema)
-
-    # target = {'transport': {
-    #   'models': [{'name': 'a', 'attrs': ['x', 'y']},
-    #              {'name': 'b', 'attrs': ['z']},
-    #              {'name': 'c', 'attrs': []}],
-    #   'categories': [{'name': 'K', 'models': ['b']},
-    #                  {'name': 'L', 'models': ['a', 'c']}]
-    # }}
+    target = {'transport': {
+      'models': [{'name': 'a', 'attrs': ['x', 'y']},
+       {'name': 'b', 'attrs': ['z']}],
+      'categories': [{'name': 'viscosity', 'models': ['b']}]
+    }}
+    
+    js.validate(target, models_schema)
