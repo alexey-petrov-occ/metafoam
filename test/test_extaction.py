@@ -68,3 +68,7 @@ def test_translation():
     target = {'transport': {'models': [{'name': 'strainRateFunction', 'attrs': []}, {'name': 'Casson', 'attrs': ['m', 'tau0', 'nuMin_', 'nuMax_']}, {'name': 'CrossPowerLaw', 'attrs': ['nu0', 'nuInf', 'm', 'n']}, {'name': 'Newtonian', 'attrs': ['nu']}, {'name': 'powerLaw', 'attrs': ['k', 'n', 'nuMin', 'nuMax']}, {'name': 'BirdCarreau', 'attrs': ['nu0', 'nuInf', 'k', 'n']}, {'name': 'HerschelBulkley', 'attrs': ['k', 'n', 'tau0', 'nu0']}], 'categories': [{'name': 'viscosity', 'models': ['strainRateFunction', 'Casson', 'CrossPowerLaw', 'Newtonian', 'powerLaw', 'BirdCarreau', 'HerschelBulkley']}]}}
     
     js.validate(target, models_schema)
+
+    test= {'transport': {'models': [{'name': 'strainRateFunction', 'attrs': []}, {'name': 'Casson', 'attrs': ['m', 'tau0', 'nuMin_', 'nuMax_']}, {'name': 'CrossPowerLaw', 'attrs': ['nu0', 'nuInf', 'm', 'n']}, {'name': 'Newtonian', 'attrs': ['nu']}, {'name': 'powerLaw', 'attrs': ['k', 'n', 'nuMin', 'nuMax']}, {'name': 'BirdCarreau', 'attrs': ['        BirdCarreauCoeffs_.lookupOrDefault', 'nu0', 'nuInf', 'k', 'n', '    a_ = BirdCarreauCoeffs_.lookupOrDefault']}, {'name': 'HerschelBulkley', 'attrs': ['k', 'n', 'tau0', 'nu0']}], 'categories': [{'name': 'viscosity', 'models': ['strainRateFunction', 'Casson', 'CrossPowerLaw', 'Newtonian', 'powerLaw', 'BirdCarreau', 'HerschelBulkley']}]}}
+    js.validate(test,models_schema)
+    
