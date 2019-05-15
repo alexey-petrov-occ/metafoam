@@ -1,7 +1,8 @@
 .PHONY: requirements-dev.txt
 .PHONY: $(wildcard x-*)
 
-x-build: x-foam-extend-3.0 x-openfoam-6 x-check-code x-check-docs
+x-build: x-check-artefacts x-check-code x-check-docs
+x-check-artefacts: x-openfoam-6 x-foam-extend-3.0
 x-check-code: x-check-coverage x-check-style
 x-check-style: x-check-pylint x-check-flake8 x-check-black
 
