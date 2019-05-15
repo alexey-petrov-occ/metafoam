@@ -143,9 +143,24 @@ def test_attrs():
     assert attrs.validate()
     assert len(attrs) == 1
 
-    y = ns.YAttr(name='y')
+    y_attr = ns.YAttr(name='y') # create a specific schema instance
+    assert y_attr.value is None # check its not initialized attribute values
+    assert y_attr.validate()
+
+    y_attr.value = 'a' # check that proper type values are accepted
     with pytest.raises(pjs.validators.ValidationError):
-        y.dummy = 'a'
+        y_attr.dummy = 'a' # expected fail on non specified attibute usage
+    with pytest.raises(pjs.validators.ValidationError):
+        y_attr.value = 1 # expected fail on non proper type value assignment
+    assert y_attr.value == 'a' # check that previously stored value stays unchanged
+
+    attrs.insert(0, y_attr) # check that any object can be put into collection
+    assert len(attrs) == 2
+    with pytest.raises(pjs.validators.ValidationError):
+        attrs.validate() # collection can be validated later on
+
+    del attrs[y_attr] # object can be deleted from the collection
+    assert len(attrs) == 1
 
     y = ns.y()
     attrs.append(ns.y())
