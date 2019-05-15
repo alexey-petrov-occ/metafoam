@@ -70,3 +70,132 @@ def test_core():
     attr.value = 1
     # with pytest.raises(pjs.validators.ValidationError):
     #   attr.value = ''
+
+solver_schema = \
+{
+  "definitions": {
+    'x-attr': {'title': 'XAttr', 'type': 'object', 'properties': {
+      'value': {'type': 'number'}
+    }, 'additionalProperties': False},
+    'x': {'type': 'object', 'properties': {
+      'x' : {'$ref': '#/definitions/x-attr'},
+    }, 'additionalProperties': False},
+    'y-attr': {'title': 'YAttr', 'type': 'object', 'properties': {
+      'name': {'type': 'string'},
+      'value': {'type': 'string'},
+    }, "required": ["name"], 'additionalProperties': False},
+    'y': {'type': 'object', 'properties': {
+      'y_attr' : {'$ref': '#/definitions/y-attr'},
+    }, 'additionalProperties': False},
+    'z-attr': {'title': 'ZAttr', 'type': 'object', 'properties': {
+      'z': {'type': 'string'}
+    }, 'additionalProperties': False},
+    'z': {'type': 'object', 'properties': {
+      'z-type' : {'$ref': '#/definitions/z-attr'},
+    }, 'additionalProperties': False},
+     'Attrs': {'type': 'array', 'items': {'oneOf': [
+      {'$ref': '#/definitions/x'},
+      {'$ref': '#/definitions/y'},
+    ]}, "additionalItems": False},
+  },
+  'title': 'Test', 'type': 'object', 'properties': {
+    'x': {'$ref': '#/definitions/x-attr'},
+    'y-attr': {'$ref': '#/definitions/y-attr'},
+    'attrs': {'$ref': '#/definitions/Attrs'},
+    'simple-x': {'$ref': '#/definitions/x'},
+    'array-x': {'type': 'array', 'items': [
+      {'$ref': '#/definitions/x'},
+    ]},
+    'simple-z': {'$ref': '#/definitions/z'},
+    'array-xz': {'type': 'array', 'items': {'oneOf': [
+      {'$ref': '#/definitions/x'},
+      {'$ref': '#/definitions/z'},
+     ]}},
+  }
+}
+
+def test_attrs():
+    js.validate({'simple-x': {'x': {'value': 1}}}, solver_schema)
+
+    js.validate({'array-x': [{'x': {'value': 1}}]}, solver_schema)
+
+    js.validate({'array-xz': [{'x': {'value': 1}}]}, solver_schema)
+
+    js.validate({'simple-z': {'z-type': {'z': 'abc'}}}, solver_schema)
+
+    instance = {'array-xz': [{'x': {'value': 1}},
+                             {'z-type': {'z': 'abc'}}]}
+    js.validate(instance, solver_schema)
+
+    instance = {'attrs': [{'x': {'value': 1}},
+                          {'y_attr': {'name': 'a', 'value': 'abc'}}]}
+    js.validate(instance, solver_schema)
+
+    with pytest.raises(js.exceptions.ValidationError):
+        instance = {'attrs': [{'y_attr': {'name': 'y', 'value': 1}}]}
+        js.validate(instance, solver_schema)
+
+    builder = pjs.ObjectBuilder(solver_schema)
+    ns = builder.build_classes(strict=True, named_only=False, standardize_names=False)
+
+    x = ns.XAttr()
+    attrs = ns.Attrs([x])
+    assert attrs.validate()
+    assert len(attrs) == 1
+
+    y = ns.YAttr(name='y')
+    with pytest.raises(pjs.validators.ValidationError):
+        y.dummy = 'a'
+
+    y = ns.y()
+    attrs.append(ns.y())
+    assert attrs.validate()
+    assert len(attrs) == 2
+
+    attrs.append(1)
+    with pytest.raises(pjs.validators.ValidationError):
+        attrs.validate()
+
+    with pytest.raises(js.exceptions.ValidationError):
+        js.validate({'attrs': [1]}, solver_schema)
+
+
+def test_xattr():
+    js.validate({'x': {'value': 1}}, solver_schema)
+
+    with pytest.raises(js.exceptions.ValidationError):
+        js.validate({'x': {'value': ''}}, solver_schema)
+
+    builder = pjs.ObjectBuilder(solver_schema)
+    ns = builder.build_classes(named_only=True, standardize_names=False)
+    x = ns.XAttr()
+
+    x.value = 1
+    assert x.value == 1
+
+    with pytest.raises(pjs.validators.ValidationError):
+      x.value = ''
+    assert x.value == 1
+
+def test_yattr():
+    js.validate({'y-attr': {'name': 'y', 'value': ''}}, solver_schema)
+
+    with pytest.raises(js.exceptions.ValidationError):
+        js.validate({'y-attr': {'name': 'y', 'value': 1}}, solver_schema)
+
+    builder = pjs.ObjectBuilder(solver_schema)
+    ns = builder.build_classes(named_only=True, standardize_names=False)
+    y = ns.YAttr()
+
+    y.value = ''
+    assert y.value == ''
+
+    with pytest.raises(pjs.validators.ValidationError):
+        y.value = 1
+    assert y.value == ''
+
+    with pytest.raises(pjs.validators.ValidationError):
+        y.validate()
+
+    y.name = 'y'
+    assert y.validate()
