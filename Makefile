@@ -74,3 +74,6 @@ x-pipenv-run:
 
 x-check-docs:
 	cd docs && make html
+
+x-check-shell:
+	shellcheck artefacts/*
