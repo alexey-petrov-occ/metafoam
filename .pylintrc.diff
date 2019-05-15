@@ -1,0 +1,16 @@
+14c14
+< ignore-patterns=test,docs,setup.py
+---
+> ignore-patterns=
+22c22
+< jobs=0
+---
+> jobs=1
+324c324
+< max-line-length=128
+---
+> max-line-length=100
+399c399
+< const-naming-style=PascalCase
+---
+> const-naming-style=UPPER_CASE
