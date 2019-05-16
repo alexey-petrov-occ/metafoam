@@ -31,3 +31,20 @@ make x-foam-extend-3.0
 ```bash
 make x-check-code
 ```
+## Instruction for Windows
+Use the following command to build Docker image
+```bash
+docker-env.bat
+```
+Once Docker image is ready corresponding Docker container can be run
+```bash
+docker-run.bat
+```
+Use the following command to install all Python related dependecies
+```bash
+make x-pipenv-env
+```
+The following command need to be run to finally enter the development environment
+```bash
+make x-pipenv-run
+```
