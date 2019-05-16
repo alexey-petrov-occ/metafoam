@@ -2,9 +2,9 @@
 # ketepflow
 
 ## Development environment
-
 To prepare development environment it is suggested to use [Docker](https://www.docker.com/resources/what-container).
 
+### For linux
 Use the following command to build Docker image
 ```bash
 make x-docker-env
@@ -13,6 +13,17 @@ Once Docker image is ready corresponding Docker container can be run
 ```bash
 make x-docker-run
 ```
+### For Windows
+Use the following command to build Docker image
+
+```bash
+docker-env.bat
+```
+Once Docker image is ready corresponding Docker container can be run
+```bash
+docker-run.bat
+```
+### In Docker image
 Use the following command to install all Python related dependecies
 ```bash
 make x-pipenv-env
@@ -31,3 +42,4 @@ make x-foam-extend-3.0
 ```bash
 make x-check-code
 ```
+
