@@ -1,5 +1,6 @@
-def handler_json():
-    source = {'a': ['x', 'y'], 'b': ['z'], 'c': []}
+source = {'a': ['x', 'y'], 'b': ['z'], 'c': []}
+def handler_json(source):
+    
     mas=[]
     print(list(source.keys()))
     for key in source.keys():
