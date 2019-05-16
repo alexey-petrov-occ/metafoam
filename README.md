@@ -43,11 +43,3 @@ make x-foam-extend-3.0
 make x-check-code
 ```
 
-Use the following command to install all Python related dependecies
-```bash
-make x-pipenv-env
-```
-The following command need to be run to finally enter the development environment
-```bash
-make x-pipenv-run
-```
