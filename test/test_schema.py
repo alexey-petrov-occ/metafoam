@@ -4,31 +4,38 @@ import jsonschema
 from jsonschema import validate
 import python_jsonschema_objects as pjs
 
+from metafoam.core import Core
+from metafoam.solver import Solver
+
+from metafoam.common import validate_solver, validate_model, categories
+
+
 def test_jsonschema():
     # A sample schema, like what we'd get from json.load()
     schema = {
-        "type" : "object",
-        "properties" : {
-            "price" : {"type" : "number"},
-            "name" : {"type" : "string"},
+        "type": "object",
+        "properties": {
+            "price": {"type": "number"},
+            "name": {"type": "string"},
         },
     }
 
     # If no exception is raised by validate(), the instance is valid.
-    validate(instance={"name" : "Eggs", "price" : 34.99}, schema=schema)
+    validate(instance={"name": "Eggs", "price": 34.99}, schema=schema)
 
     with pytest.raises(jsonschema.exceptions.ValidationError):
         validate(
-            instance={"name" : "Eggs", "price" : "Invalid"}, schema=schema,
+            instance={"name": "Eggs", "price": "Invalid"}, schema=schema,
         )
+
 
 def test_python_jsonschema_objects():
     schema = {
-        'title': 'dummy', # mandatory field
-        "type" : "object",
-        "properties" : {
-            "price" : {"type" : "number"},
-            "name" : {"type" : "string"},
+        'title': 'dummy',  # mandatory field
+        "type": "object",
+        "properties": {
+            "price": {"type": "number"},
+            "name": {"type": "string"},
         },
     }
 
@@ -38,10 +45,10 @@ def test_python_jsonschema_objects():
     dummy = ns.Dummy()
     dummy.price = 1
     with pytest.raises(pjs.validators.ValidationError):
-      dummy.price = ''
+        dummy.price = ''
 
-array_schema = \
-{
+
+array_schema = {
   "$id": "https://example.com/geographical-location.schema.json",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Longitude and Latitude Values",
@@ -54,6 +61,7 @@ array_schema = \
   ]
 }
 
+
 def test_array():
     text = """
 k
@@ -64,8 +72,8 @@ nuInf
     instance = text.splitlines()
     validate(instance, array_schema)
 
-attrs_schema = \
-{
+
+attrs_schema = {
   'definitions': {
     'attr': {
       "type": "string",
@@ -84,12 +92,13 @@ attrs_schema = \
   }
 }
 
+
 def test_attrs():
     instance = {'attrs': ['x', 'y']}
     validate(instance, attrs_schema)
 
-model_schema = \
-{
+
+model_schema = {
   'definitions': {
     'attr': {
       "type": "string",
@@ -112,12 +121,13 @@ model_schema = \
   "type": "array", "items": [{"$ref": "#/definitions/model"}]
 }
 
+
 def test_model():
     instance = [{'name': 'a', 'attrs': ['x', 'y']}, {'name': 'b', 'attrs': ['z']}]
     validate(instance, model_schema)
 
-models_schema = \
-{
+
+models_schema = {
   "definitions": {
     'attr': {
       "type": "string",
@@ -163,6 +173,7 @@ models_schema = \
   }
 }
 
+
 def test_models():
     instance = {'transport': {
       'models': [{'name': 'a', 'attrs': ['x', 'y']}, {'name': 'b', 'attrs': ['z']}],
@@ -170,25 +181,24 @@ def test_models():
     }}
     validate(instance, models_schema)
 
-    builder = pjs.ObjectBuilder(models_schema)
-    ns = builder.build_classes()
+    pjs.ObjectBuilder(models_schema)
 
-solver_schema = \
-{
+
+solver_schema = {
   'title': 'solver',
   'definitions': {
     'category': {"type": "string"},
   },
- 'type': 'object', 'properties': {
+  'type': 'object', 'properties': {
     'transport': {"$ref": "#/definitions/category"},
   },
 }
+
 
 def test_solver():
     instance = {'transport': 'viscosity'}
     validate(instance, solver_schema)
 
-from metafoam.common import *
 
 def test_validate_model():
     model = {'transport': {
@@ -202,7 +212,8 @@ def test_validate_model():
     assert 'a' in category2models['L']
 
     with pytest.raises(AssertionError):
-      validate_model(model, models_schema)
+        validate_model(model, models_schema)
+
 
 def test_validate_solver():
     model = {'transport': {
@@ -214,17 +225,16 @@ def test_validate_solver():
     validate_solver(solver, solver_schema, model)
 
     with pytest.raises(AssertionError):
-      solver = {'transport': 'M'}
-      validate_solver(solver, solver_schema, model)
+        solver = {'transport': 'M'}
+        validate_solver(solver, solver_schema, model)
+
 
 def validate_slots(instance):
     with pytest.raises(AttributeError):
-      setattr(instance, 'dummy', 1)
+        setattr(instance, 'dummy', 1)
 
     return instance
 
-from metafoam.core import *
-from metafoam.solver import *
 
 def test_solver_introspection():
     model = {'transport': {
