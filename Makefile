@@ -3,7 +3,7 @@
 
 x-build: x-check-artefacts x-check-code x-check-docs
 x-check-artefacts: x-openfoam-6 x-foam-extend-3.0
-x-check-code: x-check-coverage x-check-style
+x-check-code: x-check-cov x-check-style
 x-check-style: x-check-pylint x-check-flake8 x-check-black
 
 openfoam-6:
@@ -36,15 +36,14 @@ x-update-refs:
 x-check-test:
 	pytest --no-cov --numprocesses=0 test
 
-x-check-coverage:
-	pytest --cov-fail-under=100 --cov-report term-missing --cov-branch --numprocesses=auto -p no:warnings test
+x-check-cov:
+	pytest --cov=metafoam --cov-fail-under=100 --cov-report term-missing --cov-branch --numprocesses=auto -p no:warnings test
 
 travis-before_install:
 	sudo apt-get update
 	sudo apt-get install -y coreutils findutils grep python3-sphinx
 
 travis-install:
-	pip install codecov
 	pip install -r requirements-dev.txt
 	python setup.py develop
 

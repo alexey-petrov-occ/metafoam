@@ -16,6 +16,7 @@ sphinx = "*"
 sphinx-autodoc-typehints = "*"
 black = "*"
 python-jsonschema-objects = "*"
+codecov = "*"
 
 [packages]
 jsonschema = "*"
