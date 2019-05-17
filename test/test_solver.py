@@ -3,15 +3,14 @@ import pytest
 import jsonschema as js
 import python_jsonschema_objects as pjs
 
-core_schema = \
-{
+core_schema = {
   "definitions": {
     "name": {
       "type": "string",
     },
     'attr': {'type': 'object', 'properties': {
       'name': {"$ref": "#/definitions/name"},
-      'value': {"oneOf": [{ "type": "string" }, { "type": "number" }]},
+      'value': {"oneOf": [{"type": "string"}, {"type": "number"}]},
     }},
     "attrs": {
       "type": "array",
@@ -50,6 +49,7 @@ core_schema = \
   }
 }
 
+
 def test_core():
     with pytest.raises(js.exceptions.ValidationError):
         instance = {'transport': {
@@ -71,31 +71,35 @@ def test_core():
     # with pytest.raises(pjs.validators.ValidationError):
     #   attr.value = ''
 
-solver_schema = \
-{
+
+solver_schema = {
   "definitions": {
     'x-attr': {'title': 'XAttr', 'type': 'object', 'properties': {
       'value': {'type': 'number'}
     }, 'additionalProperties': False},
     'x': {'type': 'object', 'properties': {
-      'x' : {'$ref': '#/definitions/x-attr'},
-    }, 'additionalProperties': False},
+      'x_attr': {'$ref': '#/definitions/x-attr'},
+    }, 'required': ['x_attr'], 'additionalProperties': False},
     'y-attr': {'title': 'YAttr', 'type': 'object', 'properties': {
       'name': {'type': 'string'},
       'value': {'type': 'string'},
     }, "required": ["name"], 'additionalProperties': False},
     'y': {'type': 'object', 'properties': {
-      'y_attr' : {'$ref': '#/definitions/y-attr'},
+      'y_attr': {'$ref': '#/definitions/y-attr'},
     }, 'additionalProperties': False},
     'z-attr': {'title': 'ZAttr', 'type': 'object', 'properties': {
       'z': {'type': 'string'}
     }, 'additionalProperties': False},
     'z': {'type': 'object', 'properties': {
-      'z-type' : {'$ref': '#/definitions/z-attr'},
-    }, 'additionalProperties': False},
-     'Attrs': {'type': 'array', 'items': {'oneOf': [
+      'z_type': {'$ref': '#/definitions/z-attr'},
+    }, 'required': ['z_type'], 'additionalProperties': False},
+    'Attrs': {'type': 'array', 'items': {'oneOf': [
       {'$ref': '#/definitions/x'},
       {'$ref': '#/definitions/y'},
+    ]}, "additionalItems": False},
+    'ArrayXZ': {'type': 'array', 'items': {'oneOf': [
+      {'$ref': '#/definitions/x'},
+      {'$ref': '#/definitions/z'},
     ]}, "additionalItems": False},
   },
   'title': 'Test', 'type': 'object', 'properties': {
@@ -107,27 +111,73 @@ solver_schema = \
       {'$ref': '#/definitions/x'},
     ]},
     'simple-z': {'$ref': '#/definitions/z'},
-    'array-xz': {'type': 'array', 'items': {'oneOf': [
-      {'$ref': '#/definitions/x'},
-      {'$ref': '#/definitions/z'},
-     ]}},
+    'array-xz': {'$ref': '#/definitions/ArrayXZ'},
   }
 }
 
-def test_attrs():
-    js.validate({'simple-x': {'x': {'value': 1}}}, solver_schema)
 
-    js.validate({'array-x': [{'x': {'value': 1}}]}, solver_schema)
+def test_array_xz():
+    js.validate({'simple-x': {'x_attr': {'value': 1}}}, solver_schema)
 
-    js.validate({'array-xz': [{'x': {'value': 1}}]}, solver_schema)
+    js.validate({'array-x': [{'x_attr': {'value': 1}}]}, solver_schema)
 
-    js.validate({'simple-z': {'z-type': {'z': 'abc'}}}, solver_schema)
+    js.validate({'array-xz': [{'x_attr': {'value': 1}}]}, solver_schema)
 
-    instance = {'array-xz': [{'x': {'value': 1}},
-                             {'z-type': {'z': 'abc'}}]}
+    js.validate({'simple-z': {'z_type': {'z': 'abc'}}}, solver_schema)
+
+    instance = {'array-xz': [{'x_attr': {'value': 1}},
+                             {'z_type': {'z': 'abc'}}]}
     js.validate(instance, solver_schema)
 
-    instance = {'attrs': [{'x': {'value': 1}},
+    instance = {'array-xz': [{'x_attr': {'value': 1}},
+                             {'x_attr': {'value': 1}}]}
+    js.validate(instance, solver_schema)
+
+    builder = pjs.ObjectBuilder(solver_schema)
+    ns = builder.build_classes(strict=True, named_only=False, standardize_names=False)
+
+    array = ns.ArrayXZ([])
+    assert array.validate()
+    assert len(array) == 0
+
+    x = ns.x(x_attr=ns.XAttr())
+    assert x.validate()
+
+    with pytest.raises(js.exceptions.ValidationError):
+        instance = {'array-xz': [{'value': 1}]}
+        js.validate(instance, solver_schema)
+
+    with pytest.raises(js.exceptions.ValidationError):
+        instance = {'array-xz': [{'z': 'abc'}]}
+        js.validate(instance, solver_schema)
+
+    z_attr = ns.ZAttr()
+    array.insert(0, z_attr)
+    assert len(array) == 1
+    with pytest.raises(pjs.validators.ValidationError):
+        array.validate()
+    del array[z_attr]
+    assert len(array) == 0
+
+    x_attr = ns.XAttr()
+    array.insert(0, x_attr)
+    assert len(array) == 1
+    with pytest.raises(pjs.validators.ValidationError):
+        array.validate()
+    del array[x_attr]
+    assert len(array) == 0
+
+    with pytest.raises(pjs.validators.ValidationError):
+        x = ns.x()
+    x = ns.x(x_attr=ns.XAttr())
+
+    assert x.validate()
+    array.insert(0, x)
+    assert array.validate()
+
+
+def test_attrs():
+    instance = {'attrs': [{'x_attr': {'value': 1}},
                           {'y_attr': {'name': 'a', 'value': 'abc'}}]}
     js.validate(instance, solver_schema)
 
@@ -143,26 +193,25 @@ def test_attrs():
     assert attrs.validate()
     assert len(attrs) == 1
 
-    y_attr = ns.YAttr(name='y') # create a specific schema instance
-    assert y_attr.value is None # check its not initialized attribute values
+    y_attr = ns.YAttr(name='y')  # create a specific schema instance
+    assert y_attr.value is None  # check its not initialized attribute values
     assert y_attr.validate()
 
-    y_attr.value = 'a' # check that proper type values are accepted
+    y_attr.value = 'a'  # check that proper type values are accepted
     with pytest.raises(pjs.validators.ValidationError):
-        y_attr.dummy = 'a' # expected fail on non specified attibute usage
+        y_attr.dummy = 'a'  # expected fail on non specified attibute usage
     with pytest.raises(pjs.validators.ValidationError):
-        y_attr.value = 1 # expected fail on non proper type value assignment
-    assert y_attr.value == 'a' # check that previously stored value stays unchanged
+        y_attr.value = 1  # expected fail on non proper type value assignment
+    assert y_attr.value == 'a'  # check that previously stored value stays unchanged
 
-    attrs.insert(0, y_attr) # check that any object can be put into collection
+    attrs.insert(0, y_attr)  # check that any object can be put into collection
     assert len(attrs) == 2
     with pytest.raises(pjs.validators.ValidationError):
-        attrs.validate() # collection can be validated later on
+        attrs.validate()  # collection can be validated later on
 
-    del attrs[y_attr] # object can be deleted from the collection
+    del attrs[y_attr]  # object can be deleted from the collection
     assert len(attrs) == 1
 
-    y = ns.y()
     attrs.append(ns.y())
     assert attrs.validate()
     assert len(attrs) == 2
@@ -189,8 +238,9 @@ def test_xattr():
     assert x.value == 1
 
     with pytest.raises(pjs.validators.ValidationError):
-      x.value = ''
+        x.value = ''
     assert x.value == 1
+
 
 def test_yattr():
     js.validate({'y-attr': {'name': 'y', 'value': ''}}, solver_schema)

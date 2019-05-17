@@ -53,7 +53,8 @@ x-check-pylint:
 	@diff ${root}/.pylintrc ${root}/.pylintrc.ref > ${root}/.pylintrc.diff || exit 0
 
 x-check-flake8:
-	flake8
+	flake8 metafoam
+	flake8 test
 
 x-check-black:
 	black --config pyproject.toml metafoam
