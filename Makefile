@@ -3,7 +3,7 @@
 
 x-build: x-check-artefacts x-check-code x-check-docs
 x-check-artefacts: x-openfoam-6 x-foam-extend-3.0
-x-check-code: x-check-cov x-check-style
+x-check-code: x-check-cov x-check-style x-check-mypy
 x-check-style: x-check-pylint x-check-flake8 x-check-black
 
 openfoam-6:
@@ -37,7 +37,7 @@ x-check-test:
 	pytest --no-cov --numprocesses=0 test
 
 x-check-mypy:
-	mypy --config-file mypy.ini test/test_schema.py
+	mypy --strict --config-file mypy.ini metafoam
 
 x-check-cov:
 	pytest --cov=metafoam --cov-fail-under=100 --cov-report term-missing --cov-branch --numprocesses=auto -p no:warnings test
