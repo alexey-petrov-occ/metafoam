@@ -3,7 +3,9 @@ import pytest
 import jsonschema as js
 import python_jsonschema_objects as pjs
 
+import metafoam
 from metafoam import common
+from metafoam.common import validate, definition2schema
 
 
 @pytest.fixture
@@ -18,6 +20,7 @@ def solver_schema():
         },
     }
 
+
 @pytest.fixture
 def core_schema():
     return {
@@ -29,6 +32,7 @@ def core_schema():
             'x-attr': {'title': 'XAttr', 'type': 'object', 'properties': {
               'x_attr': {'$ref': '#/definitions/x-type'},
             }, 'required': ['x_attr'], 'additionalProperties': False},
+
             'y-type': {'title': 'YType', 'type': 'object', 'properties': {
                 'value': {'type': 'string'},
                 'name': {'type': 'string'},
@@ -36,10 +40,21 @@ def core_schema():
             'y-attr': {'title': 'YAttr', 'type': 'object', 'properties': {
               'y_attr': {'$ref': '#/definitions/y-type'},
             }, 'required': ['y_attr'], 'additionalProperties': False},
+
+            'z-type': {'title': 'ZType', 'type': 'object', 'properties': {
+                'value': {'type': 'boolean'},
+                'name': {'type': 'string'},
+            }, 'required': ['name'], 'additionalProperties': False},
+            'z-attr': {'title': 'ZAttr', 'type': 'object', 'properties': {
+              'z_attr': {'$ref': '#/definitions/z-type'},
+            }, 'required': ['z_attr'], 'additionalProperties': False},
+
             'attrs': {'title': 'TAttrs', 'type': 'array', 'items': {'oneOf': [
                 {'$ref': '#/definitions/x-attr'},
                 {'$ref': '#/definitions/y-attr'},
+                {'$ref': '#/definitions/z-attr'},
             ]}, 'additionalItems': False, 'uniqueItems': True},
+
             'model': {'type': 'object', 'properties': {
                 'name': {'type': 'string'},
                 'attrs': {'$ref': '#/definitions/attrs'},
@@ -47,6 +62,7 @@ def core_schema():
             'models': {'type': 'array', 'items': [
                 {'$ref': '#/definitions/model'},
             ], 'additionalItems': False, 'uniqueItems': True},
+
             'names': {'type': 'array', 'items': [
                 {'type': 'string'},
             ], 'additionalItems': {'type': 'string'}, 'uniqueItems': True},
@@ -57,30 +73,66 @@ def core_schema():
             'categories': {'type': 'array', 'items': {'oneOf': [
                 {'$ref': '#/definitions/category'}
             ]}, 'additionalItems': False, 'uniqueItems': True},
+
             'transport': {'type': 'object', 'properties': {
                 'models': {'$ref': '#/definitions/models'},
                 'categories': {'$ref': '#/definitions/categories'},
             }, 'required': ['models']},
-         },
-    }
 
-
-def validate(document, schema):
-    test = {'test': document}
-    js.validate(test, schema)
-
-
-def update_schema(schema, entity):
-    test_schema = {
-        'title': 'test', 'type': 'object', 'properties': {
-            'test': {'$ref': '#/definitions/{}'.format(entity)},
+            'core': {'type': 'object', 'properties': {
+                'transport': {'$ref': '#/definitions/transport'},
+            }, 'additionalProperties': False},
         },
     }
-    schema.update(test_schema)
-    return schema
+
+
+def test_solver_introspection(core_schema, solver_schema):
+    definition2schema(core_schema, 'core')
+    definition2schema(solver_schema, 'solver')
+
+    with pytest.raises(js.exceptions.ValidationError):
+        document = {'transport': {
+            'models': [
+                {'name': 'a', 'attrs': [
+                    {'d_attr': {'name': 'd', 'value': False}},
+                ]},
+            ],
+        }}
+        metafoam.Core(document, core_schema)  # check on 'additionalProperties'
+
+    document = {'transport': {
+        'models': [
+            {'name': 'a', 'attrs': [
+                {'x_attr': {'name': 'x', 'value': 1}},
+                {'y_attr': {'name': 'y', 'value': '1'}},
+            ]},
+            # {'name': 'b', 'attrs': [  # TODO
+            #     {'z_attr': {'name': 'z', 'value': False}},
+            # ]},
+        ],
+        'categories': [{'name': 'K', 'models': ['a']}],
+    }}
+    core = metafoam.Core(document, core_schema)
+
+    # solver 'transport' should be in core 'transport/categories'
+    with pytest.raises(AssertionError):
+        document = {'transport': 'L'}
+        metafoam.Solver(document, solver_schema, core)
+
+    document = {'transport': 'K'}
+    solver = metafoam.Solver(document, solver_schema, core)
+    assert solver.transport == 'K'
+
+    assert solver.transport_model == ''
+    with pytest.raises(AssertionError):
+        solver.transport_attrs
+
+    # solver.transport_model = 'b'
+    # assert solver.transport_model == 'b'
+
 
 def test_solver(solver_schema):
-    update_schema(solver_schema, 'solver')
+    definition2schema(solver_schema, 'solver')
 
     validate({}, solver_schema)
 
@@ -90,8 +142,28 @@ def test_solver(solver_schema):
         validate({'a': 'b'}, solver_schema)  # check on 'additionalProperties'
 
 
+def test_core(core_schema):
+    definition2schema(core_schema, 'core')
+
+    validate({}, core_schema)
+
+    validate({'transport': {'models': [], 'categories': []}}, core_schema)
+
+    with pytest.raises(js.exceptions.ValidationError):
+        validate({'a': 'b'}, core_schema)  # check on 'additionalProperties'
+
+    document = {'transport': {
+        'models': [{'name': 'A', 'attrs': [{'x_attr': {'name': 'x', 'value': 1}}]}],
+        'categories': [{'name': 'K', 'models': ['A', 'B']}],
+    }}
+    validate(document, core_schema)
+
+    with pytest.raises(AssertionError):
+        common.validate_model(document, core_schema)
+
+
 def test_transport(core_schema):
-    update_schema(core_schema, 'transport')
+    definition2schema(core_schema, 'transport')
 
     validate({'models': [], 'categories': []}, core_schema)
 
@@ -109,7 +181,7 @@ def test_transport(core_schema):
 
 
 def test_categories(core_schema):
-    update_schema(core_schema, 'categories')
+    definition2schema(core_schema, 'categories')
 
     validate([], core_schema)
     validate([{'name': 'K', 'models': []}], core_schema)
@@ -138,7 +210,7 @@ def test_categories(core_schema):
 
 
 def test_category(core_schema):
-    update_schema(core_schema, 'category')
+    definition2schema(core_schema, 'category')
 
     validate({'name': 'K', 'models': []}, core_schema)
     validate({'name': 'K', 'models': ['A', 'B']}, core_schema)
@@ -152,7 +224,7 @@ def test_category(core_schema):
 
 
 def test_names(core_schema):
-    update_schema(core_schema, 'names')
+    definition2schema(core_schema, 'names')
 
     validate([], core_schema)
     validate(['A'], core_schema)
@@ -169,7 +241,7 @@ def test_names(core_schema):
 
 
 def test_models(core_schema):
-    update_schema(core_schema, 'models')
+    definition2schema(core_schema, 'models')
 
     document = [{'name': 'A'}]
     validate(document, core_schema)
@@ -185,9 +257,15 @@ def test_models(core_schema):
         ]
         validate(document, core_schema)  # check on 'uniqueItems'
 
+    # document = [
+    #     {'name': 'A'},
+    #     {'name': 'B'},
+    # ]
+    # validate(document, core_schema)  # TODO
+
 
 def test_model(core_schema):
-    update_schema(core_schema, 'model')
+    definition2schema(core_schema, 'model')
 
     document = {'name': 'A'}
     validate(document, core_schema)
@@ -203,20 +281,22 @@ def test_model(core_schema):
         document = {'a': 'b'}
         validate(document, core_schema)  # check on 'additionalItems'
 
+    with pytest.raises(js.exceptions.ValidationError):
+        document = {'name': 'A', 'attrs': [
+            {'a_attr': {'name': 'a', 'value': 1}},
+        ]}
+        validate(document, core_schema)  # check on 'additionalItems'
+
     document = {'name': 'A', 'attrs': [
         {'x_attr': {'name': 'x', 'value': 1}},
         {'y_attr': {'name': 'y', 'value': '1'}},
+        {'z_attr': {'name': 'z', 'value': False}},
     ]}
     validate(document, core_schema)
 
 
 def test_attrs(core_schema):
-    test_schema = {
-        'title': 'test', 'type': 'object', 'properties': {
-            'test': {'$ref': '#/definitions/attrs'},
-        },
-    }
-    core_schema.update(test_schema)
+    definition2schema(core_schema, 'attrs')
 
     document = [
         {'x_attr': {'name': 'x', 'value': 1}},
@@ -241,13 +321,17 @@ def test_attrs(core_schema):
         validate([{'a': 'b'}], core_schema)  # check on 'additionalItems'
 
 
+def test_z_attr(core_schema):
+    definition2schema(core_schema, 'z-attr')
+
+    validate({'z_attr': {'name': 'z', 'value': False}}, core_schema)
+
+    with pytest.raises(js.exceptions.ValidationError):
+        validate({'z_attr': {'name': 'z', 'value': 1}}, core_schema)
+
+
 def test_x_attr(core_schema):
-    test_schema = {
-        'title': 'test', 'type': 'object', 'properties': {
-            'test': {'$ref': '#/definitions/x-attr'},
-        },
-    }
-    core_schema.update(test_schema)
+    definition2schema(core_schema, 'x-attr')
 
     validate({'x_attr': {'name': 'x', 'value': 1}}, core_schema)
 

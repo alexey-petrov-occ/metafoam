@@ -56,6 +56,9 @@ x-check-flake8:
 	flake8 test
 
 x-check-black:
+	black --check --config pyproject.toml metafoam
+
+x-black-run:
 	black --config pyproject.toml metafoam
 
 requirements-dev.txt:
