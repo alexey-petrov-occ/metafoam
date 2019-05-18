@@ -3,6 +3,8 @@ import pytest
 import jsonschema as js
 import python_jsonschema_objects as pjs
 
+from metafoam import common
+
 
 @pytest.fixture
 def core_schema():
@@ -33,16 +35,20 @@ def core_schema():
             'models': {'type': 'array', 'items': [
                 {'$ref': '#/definitions/model'},
             ], 'additionalItems': False, 'uniqueItems': True},
-            'names': {'type': 'array', 'items': {'oneOf': [
+            'names': {'type': 'array', 'items': [
                 {'type': 'string'},
-            ]}, 'additionalItems': False, 'uniqueItems': True},
+            ], 'additionalItems': {'type': 'string'}, 'uniqueItems': True},
             'category': {'type': 'object', 'properties': {
                 'name': {'type': 'string'},
                 'models': {'$ref': '#/definitions/names'}
             }, 'required': ['name', 'models'], 'additionalProperties': False},
             'categories': {'type': 'array', 'items': {'oneOf': [
                 {'$ref': '#/definitions/category'}
-            ]}, 'additionalItems': False, 'uniqueItems': True}
+            ]}, 'additionalItems': False, 'uniqueItems': True},
+            'transport': {'type': 'object', 'properties': {
+                'models': {'$ref': '#/definitions/models'},
+                'categories': {'$ref': '#/definitions/categories'},
+            }, 'required': ['models']},
          },
     }
 
@@ -60,6 +66,24 @@ def update_schema(schema, entity):
     }
     schema.update(test_schema)
     return schema
+
+
+def test_transport(core_schema):
+    update_schema(core_schema, 'transport')
+
+    validate({'models': [], 'categories': []}, core_schema)
+
+    with pytest.raises(js.exceptions.ValidationError):
+        validate({}, core_schema)  # check on 'required'
+
+    document = {
+        'models': [{'name': 'A', 'attrs': [{'x_attr': {'name': 'x', 'value': 1}}]}],
+        'categories': [{'name': 'K', 'models': ['A', 'B']}]
+    }
+    validate(document, core_schema)
+
+    with pytest.raises(AssertionError):
+        common.validate_transport(document)
 
 
 def test_categories(core_schema):
@@ -82,10 +106,13 @@ def test_categories(core_schema):
         ]
         validate(document, core_schema)  # check on 'uniqueItems'
 
-        document = [  # but it does not guaranty uniquenesses in the following case
-            {'name': 'K', 'models': []},
-            {'name': 'K', 'models': ['A', 'B']},
-        ]
+    # but it does not guaranty uniquenesses in the following case!
+    # with pytest.raises(js.exceptions.ValidationError):
+    #     document = [
+    #         {'name': 'K', 'models': []},
+    #         {'name': 'K', 'models': ['A', 'B']},
+    #     ]
+    #     validate(document, core_schema)  # check on 'uniqueItems'
 
 
 def test_category(core_schema):
