@@ -125,30 +125,32 @@ def test_solver_introspection(core_schema, solver_schema):
 
     document = {'transport': 'K'}
     solver = metafoam.Solver(document, solver_schema, core)
-    assert solver.transport == 'K'
 
-    assert solver.transport_model == ''
+    transport = solver.transport
+    assert transport.category == 'K'
+
+    assert transport.model == ''
     with pytest.raises(AssertionError):
-        solver.transport_attrs
+        transport.attrs
 
-    solver.transport_model = 'b'
-    assert solver.transport_model == 'b'
-
-    with pytest.raises(AssertionError):
-        solver.transport_model = 'a'
-
-    assert solver.transport_attrs == ['z']
-
-    solver.transport = 'L'
-    assert solver.transport == 'L'
+    transport.model = 'b'
+    assert transport.model == 'b'
 
     with pytest.raises(AssertionError):
-        solver.transport = 'M'
-    assert solver.transport == 'L'
+        transport.model = 'a'
 
-    assert solver.transport_model == ''
-    solver.transport_model = 'a'
-    assert solver.transport_attrs == ['x', 'y']
+    assert transport.attrs == ['z']
+
+    transport.category = 'L'
+    assert transport.category == 'L'
+
+    with pytest.raises(AssertionError):
+        transport.category = 'M'
+    assert transport.category == 'L'
+
+    assert transport.model == ''
+    transport.model = 'a'
+    assert transport.attrs == ['x', 'y']
 
 
 def test_solver(solver_schema):
