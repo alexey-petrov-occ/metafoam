@@ -40,6 +40,18 @@ def models(model: JSDocument) -> Entity2Attrs:
     return dict((item['name'], item['attrs']) for item in model['models'])
 
 
+def attrs2names(attrs) -> None:  # TODO type specification
+    "Repackge 'model' attibutes to 'name' as keys"
+    result = {}
+    for attr in attrs:
+        for typ, body in attr.items():
+            value = body.get('value', None)
+            name = body['name']
+            result[name] = {'type': typ, 'value': value}
+
+    return result
+
+
 def validate_transport(document: JSDocument) -> None:
     "Validates the 'transport' model document against 'core' schema"
     category2models = categories(document)
@@ -53,20 +65,14 @@ def validate_transport(document: JSDocument) -> None:
 
 def validate_model(document: JSDocument, schema: JSSchema) -> None:
     "Validates the 'core model' document against its schema"
-    try:
-        js.validate(document, schema)  # TODO use custom 'validate' only
-    except js.exceptions.ValidationError:
-        validate(document, schema)
+    validate(document, schema)
 
     validate_transport(document['transport'])
 
 
 def validate_solver(solver_document: JSDocument, solver_schema: JSSchema, model_document: JSDocument) -> None:
     "Validates the 'solver' document against its schema"
-    try:
-        js.validate(solver_document, solver_schema)  # TODO use custom 'validate' only
-    except js.exceptions.ValidationError:
-        validate(solver_document, solver_schema)
+    validate(solver_document, solver_schema)
 
     category2models = categories(model_document['transport'])
     assert solver_document['transport'] in category2models

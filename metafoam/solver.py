@@ -1,7 +1,7 @@
 """Defines Solver metamodel for OpenFOAM
 """
 from .common import JSDocument, JSSchema, Name, Names
-from .common import validate_solver
+from .common import validate_solver, attrs2names
 
 from .core import Core
 
@@ -49,4 +49,5 @@ class Solver:
         assert self._transport_model != ''
 
         model2attrs = self._core.models('transport')
-        return model2attrs[self._transport_model]
+        attrs = model2attrs[self._transport_model]
+        return list(attrs2names(attrs).keys())
