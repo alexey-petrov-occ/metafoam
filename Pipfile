@@ -21,6 +21,7 @@ codecov = "*"
 [packages]
 jsonschema = "*"
 metafoam = {editable = true,path = "."}
+python-jsonschema-objects = "*"
 
 [requires]
 python_version = "3"
