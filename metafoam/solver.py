@@ -19,7 +19,7 @@ class Solver:
     @property
     def transport(self) -> Name:
         "Retruns conamed property"
-        return self._document['transport']
+        return str(self._document['transport'])
 
     @transport.setter
     def transport(self, value: Name) -> None:
@@ -50,4 +50,5 @@ class Solver:
 
         model2attrs = self._core.models('transport')
         attrs = model2attrs[self._transport_model]
-        return list(attrs2names(attrs).keys())
+        names = attrs2names(attrs).keys()
+        return list(names)

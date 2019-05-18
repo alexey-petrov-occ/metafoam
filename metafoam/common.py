@@ -1,24 +1,32 @@
 """Defines OpenFOAM metamodel common functionality
 """
-from typing import Dict, List, Set
+from typing import Dict, List, Set, Any
 import jsonschema as js
 
-JSDocument = Dict  #: typedef on JSON document
-JSSchema = Dict  #: typedef on JSON schema
+
+JSDocument = Dict[str, Any]  #: typedef on JSON document
+JSSchema = Dict[str, Any]  #: typedef on JSON schema
 
 Name = str  #: typedef on entity 'name'
 Names = List[Name]  #: typedef on entity 'names'
 
 Entity2Attrs = Dict[Name, Names]  #: typedef on entity to 'attrs' mapping
 
+Type = str  #: typedef on entity schema 'type' description
+Value = Any  #: typedef on entity 'value'
+Attr = Dict[Type, Dict[Name, Value]]  #: typedef on 'attribute'
 
-def validate(document, schema):
+Attrs = List[Attr]  #: typedef on list of 'attributes'
+Models = Dict[Name, Attrs]  #: typedef on list of 'models'
+
+
+def validate(document: JSDocument, schema: JSSchema) -> None:
     "Enrich native validation mecahnism to simplify handling 'run-time' schemas"
     entry = {'entry': document}
     js.validate(entry, schema)
 
 
-def definition2schema(schema, entity):
+def definition2schema(schema: JSSchema, entity: Name) -> None:
     "Compose 'run-time' schema"
     entry = {
         'title': 'entry',
@@ -35,12 +43,12 @@ def categories(model: JSDocument) -> Entity2Attrs:
     return dict((item['name'], item['models']) for item in model['categories'])
 
 
-def models(model: JSDocument) -> Entity2Attrs:
+def models(model: JSDocument) -> Models:
     "Extracts 'models' from the given OpenFOAM 'model' description"
     return dict((item['name'], item['attrs']) for item in model['models'])
 
 
-def attrs2names(attrs) -> None:  # TODO type specification
+def attrs2names(attrs: Attrs) -> JSDocument:
     "Repackge 'model' attibutes to 'name' as keys"
     result = {}
     for attr in attrs:
