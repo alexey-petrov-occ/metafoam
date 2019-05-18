@@ -12,6 +12,24 @@ Names = List[Name]  #: typedef on entity 'names'
 Entity2Attrs = Dict[Name, Names]  #: typedef on entity to 'attrs' mapping
 
 
+def validate(document, schema):
+    "Enrich native validation mecahnism to simplify handling 'run-time' schemas"
+    entry = {'entry': document}
+    js.validate(entry, schema)
+
+
+def definition2schema(schema, entity):
+    "Compose 'run-time' schema"
+    entry = {
+        'title': 'entry',
+        'type': 'object',
+        'properties': {'entry': {'$ref': '#/definitions/{}'.format(entity)}},
+        'required': ['entry'],
+        'additionalProperties': False,
+    }
+    schema.update(entry)
+
+
 def categories(model: JSDocument) -> Entity2Attrs:
     "Extracts 'categories' from the given OpenFOAM 'model' description"
     return dict((item['name'], item['models']) for item in model['categories'])
@@ -35,14 +53,20 @@ def validate_transport(document: JSDocument) -> None:
 
 def validate_model(document: JSDocument, schema: JSSchema) -> None:
     "Validates the 'core model' document against its schema"
-    js.validate(document, schema)
+    try:
+        js.validate(document, schema)  # TODO use custom 'validate' only
+    except js.exceptions.ValidationError:
+        validate(document, schema)
 
     validate_transport(document['transport'])
 
 
 def validate_solver(solver_document: JSDocument, solver_schema: JSSchema, model_document: JSDocument) -> None:
     "Validates the 'solver' document against its schema"
-    js.validate(solver_document, solver_schema)
+    try:
+        js.validate(solver_document, solver_schema)  # TODO use custom 'validate' only
+    except js.exceptions.ValidationError:
+        validate(solver_document, solver_schema)
 
     category2models = categories(model_document['transport'])
     assert solver_document['transport'] in category2models
