@@ -67,10 +67,10 @@ x-docker-env:
 x-docker-run:
 	docker run --rm -it -v $$(pwd):/code -w /code metafoam:python bash
 
-x-pipenv-env:
+x-pip-env:
 	pipenv install --dev
 
-x-pipenv-run:
+x-pip-run:
 	pipenv shell
 
 x-check-docs:
