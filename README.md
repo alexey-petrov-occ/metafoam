@@ -19,11 +19,11 @@ make x-docker-run
 ```
 Use the following command to install all Python related dependecies
 ```bash
-make x-pipenv-env
+make x-pip-env
 ```
 The following command need to be run to finally enter the development environment
 ```bash
-make x-pipenv-run
+make x-pip-run
 ```
 ## Development OpenFOAM extractions procedures
 From the very begining `meta-foam` is supposed to easily introduce and support different OpenFOAM forks and versions.
