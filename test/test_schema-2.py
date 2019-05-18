@@ -7,6 +7,18 @@ from metafoam import common
 
 
 @pytest.fixture
+def solver_schema():
+    return {
+        'definitions': {
+            'category': {'type': 'string'},
+            'transport': {'$ref': '#/definitions/category'},
+            'solver': {'type': 'object', 'properties': {
+                'transport': {'$ref': '#/definitions/transport'},
+            }, 'additionalProperties': False},
+        },
+    }
+
+@pytest.fixture
 def core_schema():
     return {
         'definitions': {
@@ -66,6 +78,16 @@ def update_schema(schema, entity):
     }
     schema.update(test_schema)
     return schema
+
+def test_solver(solver_schema):
+    update_schema(solver_schema, 'solver')
+
+    validate({}, solver_schema)
+
+    validate({'transport': 'A'}, solver_schema)
+
+    with pytest.raises(js.exceptions.ValidationError):
+        validate({'a': 'b'}, solver_schema)  # check on 'additionalProperties'
 
 
 def test_transport(core_schema):
