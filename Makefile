@@ -36,6 +36,9 @@ x-update-refs:
 x-check-test:
 	pytest --no-cov --numprocesses=0 test
 
+x-check-mypy:
+	mypy --config-file mypy.ini test/test_schema.py
+
 x-check-cov:
 	pytest --cov=metafoam --cov-fail-under=100 --cov-report term-missing --cov-branch --numprocesses=auto -p no:warnings test
 
