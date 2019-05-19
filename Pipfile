@@ -16,10 +16,12 @@ sphinx = "*"
 sphinx-autodoc-typehints = "*"
 black = "*"
 python-jsonschema-objects = "*"
+codecov = "*"
 
 [packages]
 jsonschema = "*"
 metafoam = {editable = true,path = "."}
+python-jsonschema-objects = "*"
 
 [requires]
-python_version = "3.6"
+python_version = "3"

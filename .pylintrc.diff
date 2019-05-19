@@ -6,11 +6,16 @@
 < jobs=0
 ---
 > jobs=1
-324c324
+222c222,223
+<       XXX
+---
+>       XXX,
+>       TODO
+323c324
 < max-line-length=128
 ---
 > max-line-length=100
-399c399
+398c399
 < const-naming-style=PascalCase
 ---
 > const-naming-style=UPPER_CASE

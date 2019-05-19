@@ -1,4 +1,8 @@
-[![Build Status](https://travis-ci.com/alexey-petrov-occ/ketepflow.svg?branch=master)](https://travis-ci.com/alexey-petrov-occ/ketepflow)[![Reviewed by Hound](https://img.shields.io/badge/Reviewed_by-Hound-8E64B0.svg)](https://houndci.com)[![Requirements Status](https://requires.io/github/alexey-petrov-occ/ketepflow/requirements.svg)](https://requires.io/github/alexey-petrov-occ/ketepflow/requirements)[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/python/black)[![Coverage Status](https://coveralls.io/repos/github/alexey-petrov-occ/ketepflow/badge.svg?branch=master)](https://coveralls.io/github/alexey-petrov-occ/ketepflow?branch=master)[![codecov](https://codecov.io/gh/alexey-petrov-occ/ketepflow/branch/master/graph/badge.svg)](https://codecov.io/gh/alexey-petrov-occ/ketepflow)
+[![Build Status](https://travis-ci.com/alexey-petrov-occ/ketepflow.svg?branch=master)](https://travis-ci.com/alexey-petrov-occ/ketepflow)
+[![Reviewed by Hound](https://img.shields.io/badge/Reviewed_by-Hound-8E64B0.svg)](https://houndci.com)
+[![Requirements Status](https://requires.io/github/alexey-petrov-occ/ketepflow/requirements.svg)](https://requires.io/github/alexey-petrov-occ/ketepflow/requirements)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/python/black)
+[![codecov](https://codecov.io/gh/alexey-petrov-occ/ketepflow/branch/master/graph/badge.svg)](https://codecov.io/gh/alexey-petrov-occ/ketepflow)
 # ketepflow
 
 ## Development environment
@@ -26,11 +30,11 @@ docker-run.bat
 ### In Docker image
 Use the following command to install all Python related dependecies
 ```bash
-make x-pipenv-env
+make x-pip-env
 ```
 The following command need to be run to finally enter the development environment
 ```bash
-make x-pipenv-run
+make x-pip-run
 ```
 ## Development OpenFOAM extractions procedures
 From the very begining `meta-foam` is supposed to easily introduce and support different OpenFOAM forks and versions.

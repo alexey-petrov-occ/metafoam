@@ -11,3 +11,4 @@ metafoam.*
 .coverage
 docs/_build/*
 __pycache__
+coverage.xml

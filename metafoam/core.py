@@ -1,7 +1,7 @@
 """Defines Core metamodel for OpenFOAM
 """
 import copy
-from .common import JSDocument, JSSchema, Name, Entity2Attrs
+from .common import JSDocument, JSSchema, Name, Entity2Attrs, Models
 
 from .common import categories, models, validate_model
 
@@ -15,7 +15,7 @@ class Core:
         self._document = document
 
     @property
-    def document(self):
+    def document(self) -> JSDocument:
         "Returns initial document"
         return copy.copy(self._document)
 
@@ -23,6 +23,6 @@ class Core:
         "Extracts 'categories' for the given OpenFOAM model 'name'"
         return categories(self._document[name])
 
-    def models(self, name: Name) -> Entity2Attrs:
+    def models(self, name: Name) -> Models:
         "Extracts 'models' for the given OpenFOAM model 'name'"
         return models(self._document[name])
