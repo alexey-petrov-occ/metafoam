@@ -60,7 +60,6 @@ x-check-flake8:
 
 x-check-black:
 	black --check --config .pyproject.toml metafoam
-
 x-black-run:
 	black --config pyproject.toml metafoam
 
