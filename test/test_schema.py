@@ -9,6 +9,59 @@ from metafoam.common import validate, definition2schema
 
 
 @pytest.fixture
+def core_document():
+    return {'transport': {
+        'models': [
+            {'name': 'a', 'attrs': [
+                {'x_attr': {'name': 'x', 'value': 1}},
+                {'y_type': {'name': 'y', 'value': '1'}},
+            ]},
+            {'name': 'b', 'attrs': [
+                {'z_attr': {'name': 'z', 'value': False}},
+            ]},
+            {'name': 'c', 'attrs': []},
+        ],
+        'categories': [
+            {'name': 'K', 'models': ['b']},
+            {'name': 'L', 'models': ['a', 'c']},
+        ],
+    }}
+
+
+@pytest.fixture
+def solver_document():
+    return {'transport': 'K'}
+
+
+@pytest.fixture
+def transport(core_schema, core_document, solver_schema, solver_document):
+    definition2schema(core_schema, 'core')
+    definition2schema(solver_schema, 'solver')
+
+    core = metafoam.Core(core_document, core_schema)
+    solver = metafoam.Solver(solver_document, solver_schema, core)
+
+    return solver.transport
+
+
+def test_transport_attrs(transport):
+    transport.category = 'L'
+    transport.model = 'a'
+
+    assert transport.attrs == ['x', 'y']
+
+    instance = transport.attr('y')
+    assert instance.value == '1'
+
+    instance.value = 'abc'
+    assert instance.value == 'abc'
+
+    with pytest.raises(pjs.validators.ValidationError):
+        instance.value = 1
+    assert instance.value == 'abc'
+
+
+@pytest.fixture
 def solver_schema():
     return {
         'definitions': {
@@ -25,21 +78,21 @@ def solver_schema():
 def core_schema():
     return {
         'definitions': {
-            'x-type': {'title': 'XType', 'type': 'object', 'properties': {
+            'x-type': {'title': 'x_type', 'type': 'object', 'properties': {
                 'value': {'type': 'number'},
                 'name': {'type': 'string'},
             }, 'required': ['name'], 'additionalProperties': False},
-            'x-attr': {'title': 'XAttr', 'type': 'object', 'properties': {
+            'x-attr': {'title': 'x_attr', 'type': 'object', 'properties': {
               'x_attr': {'$ref': '#/definitions/x-type'},
             }, 'required': ['x_attr'], 'additionalProperties': False},
 
-            'y-type': {'title': 'YType', 'type': 'object', 'properties': {
+            'y-type': {'title': 'y_type', 'type': 'object', 'properties': {
                 'value': {'type': 'string'},
                 'name': {'type': 'string'},
             }, 'required': ['name'], 'additionalProperties': False},
-            'y-attr': {'title': 'YAttr', 'type': 'object', 'properties': {
-              'y_attr': {'$ref': '#/definitions/y-type'},
-            }, 'required': ['y_attr'], 'additionalProperties': False},
+            'y-attr': {'title': 'y_attr', 'type': 'object', 'properties': {
+              'y_type': {'$ref': '#/definitions/y-type'},
+            }, 'required': ['y_type'], 'additionalProperties': False},
 
             'z-type': {'title': 'ZType', 'type': 'object', 'properties': {
                 'value': {'type': 'boolean'},
@@ -104,7 +157,7 @@ def test_solver_introspection(core_schema, solver_schema):
         'models': [
             {'name': 'a', 'attrs': [
                 {'x_attr': {'name': 'x', 'value': 1}},
-                {'y_attr': {'name': 'y', 'value': '1'}},
+                {'y_type': {'name': 'y', 'value': '1'}},
             ]},
             {'name': 'b', 'attrs': [
                 {'z_attr': {'name': 'z', 'value': False}},
@@ -149,8 +202,6 @@ def test_solver_introspection(core_schema, solver_schema):
     assert transport.category == 'L'
 
     assert transport.model == ''
-    transport.model = 'a'
-    assert transport.attrs == ['x', 'y']
 
 
 def test_solver(solver_schema):
@@ -328,7 +379,7 @@ def test_model(core_schema):
 
     document = {'name': 'A', 'attrs': [
         {'x_attr': {'name': 'x', 'value': 1}},
-        {'y_attr': {'name': 'y', 'value': '1'}},
+        {'y_type': {'name': 'y', 'value': '1'}},
         {'z_attr': {'name': 'z', 'value': False}},
     ]}
     validate(document, core_schema)
@@ -339,7 +390,7 @@ def test_attrs(core_schema):
 
     document = [
         {'x_attr': {'name': 'x', 'value': 1}},
-        {'y_attr': {'name': 'y', 'value': '1'}},
+        {'y_type': {'name': 'y', 'value': '1'}},
     ]
     validate(document, core_schema)
 
@@ -351,8 +402,8 @@ def test_attrs(core_schema):
         validate(document, core_schema)  # check on 'uniqueItems'
 
     document = [
-        {'y_attr': {'name': 'y', 'value': '1'}},
-        {'y_attr': {'name': 'y', 'value': '2'}},
+        {'y_type': {'name': 'y', 'value': '1'}},
+        {'y_type': {'name': 'y', 'value': '2'}},
     ]
     validate(document, core_schema)  # check on 'uniqueItems'
 
@@ -386,9 +437,9 @@ def test_x_attr(core_schema):
     ns = builder.build_classes(strict=True, named_only=False, standardize_names=False)
 
     with pytest.raises(pjs.validators.ValidationError):
-        ns.XType()
+        ns.x_type()
 
-    x = ns.XType(name='x1')
+    x = ns.x_type(name='x1')
     assert x.name == 'x1'
     assert x.value is None
 

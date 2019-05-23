@@ -1,5 +1,7 @@
 """Defines Solver metamodel for OpenFOAM
 """
+import typing
+
 from .common import JSDocument, JSSchema, Name, Names
 from .common import validate_solver, attrs2names
 
@@ -42,15 +44,28 @@ class Transport:
 
         self._model = value
 
-    @property
-    def attrs(self) -> Names:
-        "Retruns conamed property"
+    def attrs2names(self) -> JSDocument:
+        "Returns 'attrs' repacked"
         assert self._model != ''
 
         model2attrs = self._core.models('transport')
         attrs = model2attrs[self._model]
-        names = attrs2names(attrs).keys()
+
+        return attrs2names(attrs)
+
+    @property
+    def attrs(self) -> Names:
+        "Retruns attribute names"
+        names = self.attrs2names().keys()
         return list(names)
+
+    def attr(self, name: Name) -> typing.Any:
+        "Returns particular attibute instance"
+        attr = self.attrs2names()[name]
+        namespace = self._core.namespace()
+        instance = getattr(namespace, attr['type'])(name=name)
+        instance.value = attr['value']
+        return instance
 
 
 class Solver:  # pylint: disable=too-few-public-methods
