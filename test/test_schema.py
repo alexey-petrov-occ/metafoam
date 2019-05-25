@@ -12,18 +12,18 @@ from metafoam.common import validate, definition2schema
 def core_document():
     return {'transport': {
         'models': [
-            {'name': 'a', 'attrs': [
+            {'name': 'A', 'attrs': [
                 {'x_attr': {'name': 'x', 'value': 1}},
                 {'y_type': {'name': 'y', 'value': '1'}},
             ]},
-            {'name': 'b', 'attrs': [
+            {'name': 'B', 'attrs': [
                 {'z_attr': {'name': 'z', 'value': False}},
             ]},
-            {'name': 'c', 'attrs': []},
+            {'name': 'C', 'attrs': []},
         ],
         'categories': [
-            {'name': 'K', 'models': ['b']},
-            {'name': 'L', 'models': ['a', 'c']},
+            {'name': 'K', 'models': ['A']},
+            {'name': 'L', 'models': ['A', 'C']},
         ],
     }}
 
@@ -46,7 +46,7 @@ def transport(core_schema, core_document, solver_schema, solver_document):
 
 def test_transport_attrs(transport):
     transport.category = 'L'
-    transport.model = 'a'
+    transport.model = 'A'
 
     assert transport.attrs == ['x', 'y']
 
@@ -75,68 +75,142 @@ def solver_schema():
 
 
 @pytest.fixture
-def core_schema():
+def common_definitions():
     return {
-        'definitions': {
-            'x-type': {'title': 'x_type', 'type': 'object', 'properties': {
-                'value': {'type': 'number'},
-                'name': {'type': 'string'},
-            }, 'required': ['name'], 'additionalProperties': False},
-            'x-attr': {'title': 'x_attr', 'type': 'object', 'properties': {
-              'x_attr': {'$ref': '#/definitions/x-type'},
-            }, 'required': ['x_attr'], 'additionalProperties': False},
+        'x-type': {'title': 'x_type', 'type': 'object', 'properties': {
+            'value': {'type': 'number'},
+            'name': {'type': 'string'},
+        }, 'required': ['name'], 'additionalProperties': False},
+        'x-attr': {'title': 'x_attr', 'type': 'object', 'properties': {
+          'x_attr': {'$ref': '#/definitions/x-type'},
+        }, 'required': ['x_attr'], 'additionalProperties': False},
 
-            'y-type': {'title': 'y_type', 'type': 'object', 'properties': {
-                'value': {'type': 'string'},
-                'name': {'type': 'string'},
-            }, 'required': ['name'], 'additionalProperties': False},
-            'y-attr': {'title': 'y_attr', 'type': 'object', 'properties': {
-              'y_type': {'$ref': '#/definitions/y-type'},
-            }, 'required': ['y_type'], 'additionalProperties': False},
+        'y-type': {'title': 'y_type', 'type': 'object', 'properties': {
+            'value': {'type': 'string'},
+            'name': {'type': 'string'},
+        }, 'required': ['name'], 'additionalProperties': False},
+        'y-attr': {'title': 'y_attr', 'type': 'object', 'properties': {
+          'y_type': {'$ref': '#/definitions/y-type'},
+        }, 'required': ['y_type'], 'additionalProperties': False},
 
-            'z-type': {'title': 'ZType', 'type': 'object', 'properties': {
-                'value': {'type': 'boolean'},
-                'name': {'type': 'string'},
-            }, 'required': ['name'], 'additionalProperties': False},
-            'z-attr': {'title': 'ZAttr', 'type': 'object', 'properties': {
-              'z_attr': {'$ref': '#/definitions/z-type'},
-            }, 'required': ['z_attr'], 'additionalProperties': False},
+        'z-type': {'title': 'ZType', 'type': 'object', 'properties': {
+            'value': {'type': 'boolean'},
+            'name': {'type': 'string'},
+        }, 'required': ['name'], 'additionalProperties': False},
+        'z-attr': {'title': 'ZAttr', 'type': 'object', 'properties': {
+          'z_attr': {'$ref': '#/definitions/z-type'},
+        }, 'required': ['z_attr'], 'additionalProperties': False},
 
-            'attrs': {'title': 'TAttrs', 'type': 'array', 'items': {'oneOf': [
-                {'$ref': '#/definitions/x-attr'},
-                {'$ref': '#/definitions/y-attr'},
-                {'$ref': '#/definitions/z-attr'},
-            ]}, 'additionalItems': False, 'uniqueItems': True},
+        'attrs': {'title': 'TAttrs', 'type': 'array', 'items': {'oneOf': [
+            {'$ref': '#/definitions/x-attr'},
+            {'$ref': '#/definitions/y-attr'},
+            {'$ref': '#/definitions/z-attr'},
+        ]}, 'additionalItems': False, 'uniqueItems': True},
 
-            'model': {'type': 'object', 'properties': {
-                'name': {'type': 'string'},
-                'attrs': {'$ref': '#/definitions/attrs'},
-            }, 'required': ['name'], 'additionalProperties': False},
-            'models': {'type': 'array', 'items': {'oneOf': [
-                {'$ref': '#/definitions/model'},
-            ]}, 'additionalItems': False, 'uniqueItems': True},
-
-            'names': {'type': 'array', 'items': [
-                {'type': 'string'},
-            ], 'additionalItems': {'type': 'string'}, 'uniqueItems': True},
-            'category': {'type': 'object', 'properties': {
-                'name': {'type': 'string'},
-                'models': {'$ref': '#/definitions/names'}
-            }, 'required': ['name', 'models'], 'additionalProperties': False},
-            'categories': {'type': 'array', 'items': {'oneOf': [
-                {'$ref': '#/definitions/category'}
-            ]}, 'additionalItems': False, 'uniqueItems': True},
-
-            'transport': {'type': 'object', 'properties': {
-                'models': {'$ref': '#/definitions/models'},
-                'categories': {'$ref': '#/definitions/categories'},
-            }, 'required': ['models']},
-
-            'core': {'type': 'object', 'properties': {
-                'transport': {'$ref': '#/definitions/transport'},
-            }, 'additionalProperties': False},
-        },
+        'model': {'type': 'object', 'properties': {
+            'name': {'type': 'string'},
+            'attrs': {'$ref': '#/definitions/attrs'},
+        }, 'required': ['name'], 'additionalProperties': False},
+        'models': {'type': 'array', 'items': {'oneOf': [
+            {'$ref': '#/definitions/model'},
+        ]}, 'additionalItems': False, 'uniqueItems': True},
     }
+
+
+@pytest.fixture
+def instance_definitions(common_definitions):
+    specific = {
+        'category': {'type': 'string'},
+        'transport': {'type': 'object', 'properties': {
+            'category': {'$ref': '#/definitions/category'},
+            'model': {'type': 'string'},
+            'models': {'$ref': '#/definitions/models'},
+        }, 'required': ['category']},
+    }
+
+    common_definitions.update(specific)  # (pjs) order of 'definitions' has a sense
+    return common_definitions
+
+
+@pytest.fixture
+def instance_schema(instance_definitions):
+    return {'definitions': instance_definitions}
+
+
+@pytest.fixture
+def instance_document():
+    return {'transport': {
+        'category': 'L',
+        'model': '',
+        'models': [
+            {'name': 'a', 'attrs': [
+                {'x_attr': {'name': 'x', 'value': 1}},
+                {'y_type': {'name': 'y', 'value': '1'}},
+            ]},
+            {'name': 'b', 'attrs': [
+                {'z_attr': {'name': 'z', 'value': False}},
+            ]},
+        ],
+    }}
+
+
+def test_instance_transport(instance_schema, instance_document):
+    definition2schema(instance_schema, 'transport')
+
+    with pytest.raises(js.exceptions.ValidationError):
+        validate({}, instance_schema)  # check on 'required'
+
+    validate({'category': 'L', 'models': []}, instance_schema)
+
+    document = instance_document['transport']
+    validate(document, instance_schema)
+
+
+def test_instance_category(instance_schema, instance_document):
+    definition2schema(instance_schema, 'category')
+    validate('A', instance_schema)
+
+    with pytest.raises(js.exceptions.ValidationError):
+        validate(1, instance_schema)
+
+    with pytest.raises(js.exceptions.ValidationError):
+        validate({}, instance_schema)
+
+    with pytest.raises(js.exceptions.ValidationError):
+        validate([], instance_schema)
+
+
+@pytest.fixture
+def core_definitions(common_definitions):
+    specific = {
+        'names': {'type': 'array', 'items': [
+            {'type': 'string'},
+        ], 'additionalItems': {'type': 'string'}, 'uniqueItems': True},
+        'category': {'type': 'object', 'properties': {
+            'name': {'type': 'string'},
+            'models': {'$ref': '#/definitions/names'}
+        }, 'required': ['name', 'models'], 'additionalProperties': False},
+        'categories': {'type': 'array', 'items': {'oneOf': [
+            {'$ref': '#/definitions/category'}
+        ]}, 'additionalItems': False, 'uniqueItems': True},
+
+        'transport': {'type': 'object', 'properties': {
+            'models': {'$ref': '#/definitions/models'},
+            'categories': {'$ref': '#/definitions/categories'},
+        }, 'required': ['models']},
+
+        'core': {'type': 'object', 'properties': {
+            'transport': {'$ref': '#/definitions/transport'},
+        }, 'additionalProperties': False},
+    }
+
+    common_definitions.update(specific)  # (pjs) order of 'definitions' has a sense
+    return common_definitions
+
+
+@pytest.fixture
+def core_schema(core_definitions):
+    return {'definitions': core_definitions}
 
 
 def test_solver_introspection(core_schema, solver_schema):
