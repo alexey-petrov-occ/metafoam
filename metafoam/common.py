@@ -28,6 +28,7 @@ def validate(document: JSDocument, schema: JSSchema) -> None:
 
 def definition2schema(schema: JSSchema, entity: Name) -> None:
     "Compose 'run-time' schema"
+    assert entity in schema['definitions'], entity
     entry = {
         'title': 'entry',
         'type': 'object',
