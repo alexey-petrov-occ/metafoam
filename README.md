@@ -1,9 +1,9 @@
-[![Build Status](https://travis-ci.com/alexey-petrov-occ/ketepflow.svg?branch=master)](https://travis-ci.com/alexey-petrov-occ/ketepflow)
+[![Build Status](https://travis-ci.com/alexey-petrov-occ/metafoam.svg?branch=master)](https://travis-ci.com/alexey-petrov-occ/metafoam)
 [![Reviewed by Hound](https://img.shields.io/badge/Reviewed_by-Hound-8E64B0.svg)](https://houndci.com)
-[![Requirements Status](https://requires.io/github/alexey-petrov-occ/ketepflow/requirements.svg)](https://requires.io/github/alexey-petrov-occ/ketepflow/requirements)
+[![Requirements Status](https://requires.io/github/alexey-petrov-occ/metafoam/requirements.svg)](https://requires.io/github/alexey-petrov-occ/metafoam/requirements)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/python/black)
-[![codecov](https://codecov.io/gh/alexey-petrov-occ/ketepflow/branch/master/graph/badge.svg)](https://codecov.io/gh/alexey-petrov-occ/ketepflow)
-# ketepflow
+[![codecov](https://codecov.io/gh/alexey-petrov-occ/metafoam/branch/master/graph/badge.svg)](https://codecov.io/gh/alexey-petrov-occ/metafoam)
+# metafoam
 
 ## Development environment
 To prepare development environment it is suggested to use [Docker](https://www.docker.com/resources/what-container).
@@ -46,4 +46,3 @@ make x-foam-extend-3.0
 ```bash
 make x-check-code
 ```
-

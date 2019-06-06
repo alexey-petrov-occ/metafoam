@@ -1,0 +1,51 @@
+@startuml foam2artefacts
+
+cloud OpenFOAM {
+    folder forkA as "Fork #A" {
+        cloud transportA as "TransportModels" {
+            cloud viscosityA as "Viscocity"
+            entity X_forkA as "Model X"
+            entity Y_forkA as "Model Y"
+        }
+    }
+
+    folder forkB as "Fork #B" {
+        cloud transportB as "TransportModels" {
+            cloud viscosityB as "Viscocity"
+            entity X_forkB as "Model X"
+            entity Y_forkB as "Model Y"
+            entity Z_forkB as "Model Z"
+        }
+    }
+}
+
+folder artefacts as "Artefacts" {
+    folder transportModels as "TransportModels" {
+        folder ForkA as "Fork #A" {
+            artifact modelAX as "Model X"
+            artifact modelAY as "Model Y"
+        }
+        folder ForkB as "Fork #B" {
+            artifact modelBX as "Model X"
+            artifact modelBY as "Model Y"
+            artifact modelBZ as "Model Z"
+        }
+        folder viscocity as "Viscosity" {
+            folder viscosityForkA as "Fork #A" {
+                interface viscocityAX as "Model X"
+                interface viscocityAY as "Model Y"
+            }
+            folder viscosityForkB as "Fork #B" {
+                interface viscocityBY as "Model Y"
+                interface viscocityBZ as "Model Z"
+            }
+        }
+
+    }
+}
+
+node extractor as "OpenFOAM\nMeta-model\nExtractor"
+OpenFOAM ..> extractor
+extractor ..> artefacts
+
+@enduml
