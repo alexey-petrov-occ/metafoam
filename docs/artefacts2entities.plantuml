@@ -1,0 +1,28 @@
+@startuml artefacts2entities
+
+component core as "Core"
+artifact coreSchema as "schema"
+artifact coreDocument as "document"
+
+core o-- coreSchema
+core o-- coreDocument
+
+component solver as "Solver"
+artifact solverSchema as "schema"
+artifact solverDocument as "document"
+
+solver o-- solverSchema
+solver o-- solverDocument
+
+solver ..> core
+
+component gui as "GUI"
+artifact guiSchema as "schema"
+artifact guiDocument as "document"
+
+gui o-- guiSchema
+gui o-- guiDocument
+
+gui ..> solver
+
+@enduml

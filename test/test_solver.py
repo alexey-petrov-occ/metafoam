@@ -156,7 +156,7 @@ def test_array_xz():
     assert len(array) == 1
     with pytest.raises(pjs.validators.ValidationError):
         array.validate()
-    del array[z_attr]
+    del array[0]
     assert len(array) == 0
 
     x_attr = ns.XAttr()
@@ -164,7 +164,7 @@ def test_array_xz():
     assert len(array) == 1
     with pytest.raises(pjs.validators.ValidationError):
         array.validate()
-    del array[x_attr]
+    del array[0]
     assert len(array) == 0
 
     with pytest.raises(pjs.validators.ValidationError):
@@ -209,16 +209,20 @@ def test_attrs():
     with pytest.raises(pjs.validators.ValidationError):
         attrs.validate()  # collection can be validated later on
 
-    del attrs[y_attr]  # object can be deleted from the collection
+    del attrs[1]  # object can be deleted from the collection
     assert len(attrs) == 1
 
     attrs.append(ns.y())
-    assert attrs.validate()
-    assert len(attrs) == 2
+    with pytest.raises(pjs.validators.ValidationError):
+        assert attrs.validate()
+    del attrs[1]
+    assert len(attrs) == 1
 
     attrs.append(1)
     with pytest.raises(pjs.validators.ValidationError):
         attrs.validate()
+    del attrs[1]
+    assert len(attrs) == 1
 
     with pytest.raises(js.exceptions.ValidationError):
         js.validate({'attrs': [1]}, solver_schema)
