@@ -3,6 +3,7 @@
 [![Requirements Status](https://requires.io/github/alexey-petrov-occ/metafoam/requirements.svg)](https://requires.io/github/alexey-petrov-occ/metafoam/requirements)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/python/black)
 [![codecov](https://codecov.io/gh/alexey-petrov-occ/metafoam/branch/master/graph/badge.svg)](https://codecov.io/gh/alexey-petrov-occ/metafoam)
+[![Gitter](https://badges.gitter.im/metafoam-occ/community.svg)](https://gitter.im/metafoam-occ/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 # metafoam
 
 ## Development environment

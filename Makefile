@@ -73,6 +73,9 @@ x-docker-env:
 x-docker-run:
 	docker run --rm -it -v $$(pwd):/code -w /code metafoam:python bash
 
+x-pip-lock:
+	pipenv lock --pre
+
 x-pip-env:
 	pipenv install --dev
 
